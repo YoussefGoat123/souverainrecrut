@@ -1,0 +1,27 @@
+# Fichiers exclus du contexte de build Docker :
+# image plus légère, build plus rapide, et aucun secret embarqué.
+
+# Dépendances et builds locaux (reconstruits dans l'image)
+node_modules
+dist
+
+# Secrets et configuration locale
+.env
+.env.*
+
+# Tests, rapports et outils de qualité
+tests
+coverage
+reports
+.scannerwork
+jest.config.js
+tsconfig.test.json
+sonar-project.properties
+
+# Divers
+*.md
+*.log
+.git
+.gitignore
+Dockerfile
+.dockerignore

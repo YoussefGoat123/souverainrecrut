@@ -9,3 +9,6 @@ coverage/
 
 # Fichiers temporaires du scanner SonarQube
 .scannerwork/
+
+# Rapports générés (JUnit, Trivy)
+reports/

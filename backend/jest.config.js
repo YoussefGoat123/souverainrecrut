@@ -17,4 +17,9 @@ module.exports = {
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov"],
+  // Rapport JUnit (reports/junit.xml) lu par Jenkins pour afficher le résultat de chaque test
+  reporters: [
+    "default",
+    ["jest-junit", { outputDirectory: "reports", outputName: "junit.xml" }],
+  ],
 };
