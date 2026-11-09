@@ -45,3 +45,8 @@ Thumbs.db
 # ==========================
 
 prisma/dev.db
+# ==========================
+# Notes personnelles (journal de bord, supports de cours)
+# ==========================
+
+process/
