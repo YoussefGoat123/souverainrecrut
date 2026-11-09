@@ -1,0 +1,426 @@
+Started by user  Elbaz
+Obtained Jenkinsfile from git https://github.com/YoussefGoat123/souverainrecrut.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on  in /var/jenkins_home/workspace/souverainrecrut-backend
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+Selected Git installation does not exist. Using Default
+The recommended git tool is: NONE
+No credentials specified
+Cloning the remote Git repository
+Cloning repository https://github.com/YoussefGoat123/souverainrecrut.git
+ > git init /var/jenkins_home/workspace/souverainrecrut-backend # timeout=10
+Fetching upstream changes from https://github.com/YoussefGoat123/souverainrecrut.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/YoussefGoat123/souverainrecrut.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/YoussefGoat123/souverainrecrut.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/Dev^{commit} # timeout=10
+Checking out Revision 03eeb89debb591242040345069626a9c23f3c9f4 (refs/remotes/origin/Dev)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 03eeb89debb591242040345069626a9c23f3c9f4 # timeout=10
+Commit message: "Pipeline CI Jenkins + Dockerfile sécurisé (Node 22, non-root, healthcheck) + rapport JUnit"
+First time build. Skipping changelog.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timestamps
+[Pipeline] {
+[Pipeline] timeout
+[2026-11-09T13:50:56.771Z] Timeout set to expire in 30 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Init)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+[2026-11-09T13:50:57.454Z] + node -p require('./backend/package.json').version
+[Pipeline] sh
+[2026-11-09T13:50:59.627Z] + git rev-parse HEAD
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] echo
+[2026-11-09T13:50:59.766Z] Commit 03eeb89debb591242040345069626a9c23f3c9f4 -> image jogoat123/souverainrecrut-backend:1.0.0-03eeb89
+[Pipeline] sh
+[2026-11-09T13:51:00.054Z] + node -v
+[2026-11-09T13:51:00.054Z] v22.23.4
+[2026-11-09T13:51:00.054Z] + npm -v
+[2026-11-09T13:51:00.606Z] 10.9.9
+[2026-11-09T13:51:00.606Z] + docker --version
+[2026-11-09T13:51:01.520Z] Docker version 29.9.3, build 5457199
+[2026-11-09T13:51:01.520Z] + trivy --version
+[2026-11-09T13:51:01.520Z] + head -1
+[2026-11-09T13:51:04.007Z] Version: 0.76.2
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Install)
+[Pipeline] dir
+[2026-11-09T13:51:04.423Z] Running in /var/jenkins_home/workspace/souverainrecrut-backend/backend
+[Pipeline] {
+[Pipeline] sh
+[2026-11-09T13:51:04.745Z] + npm ci
+[2026-11-09T13:51:11.233Z] npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+[2026-11-09T13:51:14.469Z] npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+[2026-11-09T13:51:14.469Z] npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+[2026-11-09T13:51:22.502Z] npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+[2026-11-09T13:51:22.502Z] npm warn deprecated glob@11.1.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+[2026-11-09T13:52:43.602Z] 
+[2026-11-09T13:52:43.603Z] added 562 packages, and audited 563 packages in 2m
+[2026-11-09T13:52:43.603Z] 
+[2026-11-09T13:52:43.603Z] 106 packages are looking for funding
+[2026-11-09T13:52:43.603Z]   run `npm fund` for details
+[2026-11-09T13:52:43.603Z] 
+[2026-11-09T13:52:43.603Z] 26 vulnerabilities (1 low, 20 moderate, 5 high)
+[2026-11-09T13:52:43.603Z] 
+[2026-11-09T13:52:43.604Z] To address issues that do not require attention, run:
+[2026-11-09T13:52:43.604Z]   npm audit fix
+[2026-11-09T13:52:43.604Z] 
+[2026-11-09T13:52:43.604Z] To address all issues (including breaking changes), run:
+[2026-11-09T13:52:43.604Z]   npm audit fix --force
+[2026-11-09T13:52:43.604Z] 
+[2026-11-09T13:52:43.604Z] Run `npm audit` for details.
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Prisma generate)
+[Pipeline] dir
+[2026-11-09T13:52:44.077Z] Running in /var/jenkins_home/workspace/souverainrecrut-backend/backend
+[Pipeline] {
+[Pipeline] sh
+[2026-11-09T13:52:44.452Z] + npx prisma generate
+[2026-11-09T13:52:46.331Z] Loaded Prisma config from prisma.config.ts.
+[2026-11-09T13:52:46.331Z] 
+[2026-11-09T13:52:46.584Z] Prisma config detected, skipping environment variable loading.
+[2026-11-09T13:52:46.584Z] Prisma schema loaded from prisma/schema.prisma
+[2026-11-09T13:52:47.142Z] ┌─────────────────────────────────────────────────────────┐
+[2026-11-09T13:52:47.142Z] │  Update available 6.16.2 -> 8.0.0-rc.33                 │
+[2026-11-09T13:52:47.142Z] │                                                         │
+[2026-11-09T13:52:47.142Z] │  This is a major update - please follow the guide at    │
+[2026-11-09T13:52:47.142Z] │  https://pris.ly/d/major-version-upgrade                │
+[2026-11-09T13:52:47.142Z] │                                                         │
+[2026-11-09T13:52:47.142Z] │  Run the following to update                            │
+[2026-11-09T13:52:47.142Z] │    npm i --save-dev prisma@latest                       │
+[2026-11-09T13:52:47.142Z] │    npm i @prisma/client@latest                          │
+[2026-11-09T13:52:47.142Z] └─────────────────────────────────────────────────────────┘
+[2026-11-09T13:52:47.142Z] 
+[2026-11-09T13:52:47.142Z] ✔ Generated Prisma Client (v6.16.2) to ./node_modules/@prisma/client in 150ms
+[2026-11-09T13:52:47.142Z] 
+[2026-11-09T13:52:47.142Z] Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+[2026-11-09T13:52:47.142Z] 
+[2026-11-09T13:52:47.142Z] Tip: Interested in query caching in just a few lines of code? Try Accelerate today! https://pris.ly/tip-3-accelerate
+[2026-11-09T13:52:47.142Z] 
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Tests)
+[Pipeline] dir
+[2026-11-09T13:52:47.617Z] Running in /var/jenkins_home/workspace/souverainrecrut-backend/backend
+[Pipeline] {
+[Pipeline] sh
+[2026-11-09T13:52:47.956Z] + npm run test:coverage
+[2026-11-09T13:52:47.957Z] 
+[2026-11-09T13:52:47.957Z] > souverainrecrut-backend@1.0.0 test:coverage
+[2026-11-09T13:52:47.957Z] > jest --coverage
+[2026-11-09T13:52:47.957Z] 
+[2026-11-09T13:59:10.194Z] GET /v1/candidates 401 168.379 ms - 78
+[2026-11-09T13:59:10.221Z] GET /v1/candidates 401 74.579 ms - 68
+[2026-11-09T13:59:10.221Z] GET / 200 80.108 ms - 127
+[2026-11-09T13:59:10.221Z] GET /v1/info 200 51.100 ms - 242
+[2026-11-09T13:59:10.221Z] GET /v1/jobs 200 164.475 ms - 255
+[2026-11-09T13:59:10.221Z] POST /v1/users 201 1027.287 ms - 200
+[2026-11-09T13:59:10.221Z] GET /v1/candidates/c-1 500 187.507 ms - 79
+[2026-11-09T13:59:10.221Z] GET /v1/candidates 401 14.127 ms - 79
+[2026-11-09T13:59:10.221Z] GET /v1/candidates 401 14.670 ms - 79
+[2026-11-09T13:59:10.221Z] GET /v1/health 200 69.207 ms - 122
+[2026-11-09T13:59:10.221Z] GET /v1/dashboard/stats 200 166.674 ms - 101
+[2026-11-09T13:59:10.221Z] GET /v1/candidates 200 29.282 ms - 86
+[2026-11-09T13:59:10.221Z] GET /v1/jobs/j-1 200 20.247 ms - 193
+[2026-11-09T13:59:10.221Z] POST /v1/users 409 137.605 ms - 83
+[2026-11-09T13:59:10.221Z] GET /v1/jobs/inconnue 404 11.488 ms - 71
+[2026-11-09T13:59:10.221Z] GET /v1/applications 200 690.057 ms - 151
+[2026-11-09T13:59:10.222Z] POST /v1/jobs 201 23.305 ms - 193
+[2026-11-09T13:59:10.222Z] POST /v1/jobs 400 7.083 ms - 427
+[2026-11-09T13:59:10.222Z] PUT /v1/jobs/j-1 200 9.632 ms - 192
+[2026-11-09T13:59:10.222Z] PUT /v1/jobs/inconnue 404 3.707 ms - 71
+[2026-11-09T13:59:10.222Z] DELETE /v1/jobs/j-1 200 22.275 ms - 193
+[2026-11-09T13:59:10.222Z] DELETE /v1/candidates/c-1 403 8.896 ms - 95
+[2026-11-09T13:59:10.222Z] DELETE /v1/jobs/j-1 403 3.957 ms - 95
+[2026-11-09T13:59:10.222Z] DELETE /v1/applications/a-1 403 18.106 ms - 95
+[2026-11-09T13:59:10.223Z] GET /v1/users 403 11.437 ms - 95
+[2026-11-09T13:59:10.223Z] GET /v1/users 200 10.504 ms - 86
+[2026-11-09T13:59:10.223Z] GET /v1/candidates?page=2&limit=10 200 319.845 ms - 175
+[2026-11-09T13:59:10.223Z] DELETE /v1/jobs/inconnue 404 10.429 ms - 71
+[2026-11-09T13:59:10.223Z] GET /v1/candidates/c-1 200 42.715 ms - 112
+[2026-11-09T13:59:10.223Z] GET /v1/ready 200 8.384 ms - 104
+[2026-11-09T13:59:10.223Z] GET /v1/ready 503 11.081 ms - 112
+[2026-11-09T13:59:10.223Z] GET /v1/health 200 3.239 ms - 122
+[2026-11-09T13:59:10.223Z] PASS tests/access-control.test.ts (74.091 s)
+[2026-11-09T13:59:10.223Z]   ● Console
+[2026-11-09T13:59:10.223Z] 
+[2026-11-09T13:59:10.223Z]     console.log
+[2026-11-09T13:59:10.224Z]       ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z] PASS tests/users.test.ts (74.647 s)
+[2026-11-09T13:59:10.224Z]   ● Console
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z]     console.log
+[2026-11-09T13:59:10.224Z]       ◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z] PASS tests/jobs.test.ts (74.337 s)
+[2026-11-09T13:59:10.224Z]   ● Console
+[2026-11-09T13:59:10.224Z] 
+[2026-11-09T13:59:10.224Z]     console.log
+[2026-11-09T13:59:10.227Z]       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+[2026-11-09T13:59:10.227Z] 
+[2026-11-09T13:59:10.227Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.227Z] 
+[2026-11-09T13:59:10.227Z] GET /v1/route-inexistante 404 3.182 ms - 93
+[2026-11-09T13:59:10.227Z] POST /v1/users 400 33.618 ms - 173
+[2026-11-09T13:59:10.228Z] GET /v1/users/u-2 200 24.626 ms - 144
+[2026-11-09T13:59:10.228Z] GET /v1/users/inconnu 404 28.937 ms - 77
+[2026-11-09T13:59:10.228Z] PUT /v1/users/u-2 200 8.026 ms - 147
+[2026-11-09T13:59:10.228Z] DELETE /v1/users/u-2 200 6.463 ms - 144
+[2026-11-09T13:59:10.228Z] GET /v1/candidates/inconnu 404 187.536 ms - 74
+[2026-11-09T13:59:10.228Z] POST /v1/auth/login 200 1086.228 ms - 403
+[2026-11-09T13:59:10.228Z] GET /v1/applications/a-1 200 21.480 ms - 89
+[2026-11-09T13:59:10.228Z] GET /v1/applications/inconnue 404 7.721 ms - 77
+[2026-11-09T13:59:10.228Z] POST /v1/auth/login 200 40.264 ms - 403
+[2026-11-09T13:59:10.228Z] POST /v1/auth/login 401 7.981 ms - 84
+[2026-11-09T13:59:10.228Z] POST /v1/auth/login 401 7.820 ms - 84
+[2026-11-09T13:59:10.228Z] GET /v1/auth/me 200 7.273 ms - 211
+[2026-11-09T13:59:10.228Z] GET /v1/auth/me 404 5.286 ms - 77
+[2026-11-09T13:59:10.228Z] GET /v1/auth/me 401 4.007 ms - 78
+[2026-11-09T13:59:10.229Z] PASS tests/errors-and-utils.test.ts (65.777 s)
+[2026-11-09T13:59:10.229Z]   ● Console
+[2026-11-09T13:59:10.229Z] 
+[2026-11-09T13:59:10.229Z]     console.log
+[2026-11-09T13:59:10.229Z]       ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[2026-11-09T13:59:10.229Z] 
+[2026-11-09T13:59:10.229Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.229Z] 
+[2026-11-09T13:59:10.230Z] PASS tests/health.test.ts (74.658 s)
+[2026-11-09T13:59:10.230Z]   ● Console
+[2026-11-09T13:59:10.230Z] 
+[2026-11-09T13:59:10.230Z]     console.log
+[2026-11-09T13:59:10.230Z]       ◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+[2026-11-09T13:59:10.230Z] 
+[2026-11-09T13:59:10.230Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.230Z] 
+[2026-11-09T13:59:10.230Z] PASS tests/dashboard.test.ts (74.259 s)
+[2026-11-09T13:59:10.230Z]   ● Console
+[2026-11-09T13:59:10.230Z] 
+[2026-11-09T13:59:10.232Z]     console.log
+[2026-11-09T13:59:10.232Z]       ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[2026-11-09T13:59:10.232Z] 
+[2026-11-09T13:59:10.233Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.233Z] 
+[2026-11-09T13:59:10.233Z] POST /v1/applications 201 9.542 ms - 89
+[2026-11-09T13:59:10.233Z] POST /v1/applications 400 9.778 ms - 254
+[2026-11-09T13:59:10.233Z] PUT /v1/applications/a-1 200 7.288 ms - 90
+[2026-11-09T13:59:10.233Z] PUT /v1/applications/a-1 400 6.038 ms - 200
+[2026-11-09T13:59:10.233Z] DELETE /v1/applications/a-1 200 3.879 ms - 89
+[2026-11-09T13:59:10.233Z] POST /v1/candidates 201 79.188 ms - 112
+[2026-11-09T13:59:10.233Z] PASS tests/auth.test.ts (75.737 s)
+[2026-11-09T13:59:10.233Z]   ● Console
+[2026-11-09T13:59:10.233Z] 
+[2026-11-09T13:59:10.233Z]     console.log
+[2026-11-09T13:59:10.233Z]       ◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+[2026-11-09T13:59:10.233Z] 
+[2026-11-09T13:59:10.234Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.234Z] 
+[2026-11-09T13:59:10.234Z] PASS tests/applications.test.ts (75.847 s)
+[2026-11-09T13:59:10.234Z]   ● Console
+[2026-11-09T13:59:10.234Z] 
+[2026-11-09T13:59:10.234Z]     console.log
+[2026-11-09T13:59:10.234Z]       ◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+[2026-11-09T13:59:10.235Z] 
+[2026-11-09T13:59:10.235Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.235Z] 
+[2026-11-09T13:59:10.235Z] POST /v1/candidates 409 13.390 ms - 94
+[2026-11-09T13:59:10.235Z] POST /v1/candidates 400 18.419 ms - 226
+[2026-11-09T13:59:10.235Z] PUT /v1/candidates/c-1 200 22.238 ms - 112
+[2026-11-09T13:59:10.235Z] PUT /v1/candidates/inconnu 404 33.623 ms - 74
+[2026-11-09T13:59:10.236Z] DELETE /v1/candidates/c-1 200 13.776 ms - 112
+[2026-11-09T13:59:10.837Z] PASS tests/candidates.test.ts (75.77 s)
+[2026-11-09T13:59:10.840Z]   ● Console
+[2026-11-09T13:59:10.841Z] 
+[2026-11-09T13:59:10.841Z]     console.log
+[2026-11-09T13:59:10.842Z]       ◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+[2026-11-09T13:59:10.842Z] 
+[2026-11-09T13:59:10.842Z]       at _log (node_modules/dotenv/lib/main.js:131:11)
+[2026-11-09T13:59:10.842Z] 
+[2026-11-09T13:59:11.448Z] A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+[2026-11-09T13:59:11.745Z] -------------------|---------|----------|---------|---------|-------------------
+[2026-11-09T13:59:11.746Z] File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+[2026-11-09T13:59:11.746Z] -------------------|---------|----------|---------|---------|-------------------
+[2026-11-09T13:59:11.746Z] All files          |     100 |    68.11 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]  src               |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   app.ts           |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]  src/config        |     100 |    66.66 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   env.ts           |     100 |    66.66 |     100 |     100 | 8-14              
+[2026-11-09T13:59:11.746Z]  src/controllers   |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.746Z]   ...controller.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]  src/errors        |     100 |        0 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]   app.error.ts     |     100 |        0 |     100 |     100 | 9                 
+[2026-11-09T13:59:11.748Z]  src/middlewares   |     100 |    93.75 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.748Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.750Z]   ...middleware.ts |     100 |       50 |     100 |     100 | 10                
+[2026-11-09T13:59:11.750Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.750Z]   ...middleware.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.750Z]  src/repositories  |     100 |        0 |     100 |     100 |                   
+[2026-11-09T13:59:11.750Z]   ...repository.ts |     100 |        0 |     100 |     100 | 13                
+[2026-11-09T13:59:11.750Z]   ...repository.ts |     100 |        0 |     100 |     100 | 9                 
+[2026-11-09T13:59:11.750Z]   ...repository.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.752Z]   ...repository.ts |     100 |        0 |     100 |     100 | 9                 
+[2026-11-09T13:59:11.752Z]   ...repository.ts |     100 |        0 |     100 |     100 | 9                 
+[2026-11-09T13:59:11.752Z]  src/routes        |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.752Z]   ...ion.routes.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.752Z]   auth.routes.ts   |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.752Z]   ...ate.routes.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.752Z]   ...ard.routes.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   health.routes.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   index.ts         |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   info.routes.ts   |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   job.routes.ts    |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   user.routes.ts   |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]  src/services      |     100 |    69.23 |     100 |     100 |                   
+[2026-11-09T13:59:11.754Z]   ...on.service.ts |     100 |       50 |     100 |     100 | 19                
+[2026-11-09T13:59:11.756Z]   auth.service.ts  |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.756Z]   ...te.service.ts |     100 |    66.66 |     100 |     100 | 16                
+[2026-11-09T13:59:11.756Z]   ...rd.service.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.756Z]   ...th.service.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.756Z]   info.service.ts  |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.756Z]   job.service.ts   |     100 |       50 |     100 |     100 | 16                
+[2026-11-09T13:59:11.756Z]   user.service.ts  |     100 |       75 |     100 |     100 | 17                
+[2026-11-09T13:59:11.758Z]  src/utils         |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.758Z]   async-handler.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.758Z]   pagination.ts    |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.758Z]  src/validators    |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.758Z]   ...ion.schema.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.758Z]   ...ate.schema.ts |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.759Z]   job.schema.ts    |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.759Z]   user.schema.ts   |     100 |      100 |     100 |     100 |                   
+[2026-11-09T13:59:11.759Z] -------------------|---------|----------|---------|---------|-------------------
+[2026-11-09T13:59:12.019Z] 
+[2026-11-09T13:59:12.021Z] Test Suites: 9 passed, 9 total
+[2026-11-09T13:59:12.021Z] Tests:       65 passed, 65 total
+[2026-11-09T13:59:12.022Z] Snapshots:   0 total
+[2026-11-09T13:59:12.022Z] Time:        383.205 s
+[2026-11-09T13:59:12.022Z] Ran all test suites.
+[Pipeline] }
+[Pipeline] // dir
+Post stage
+[Pipeline] junit
+[2026-11-09T13:59:15.867Z] Recording test results
+[2026-11-09T13:59:17.212Z] [Checks API] No suitable checks publisher found.
+[Pipeline] archiveArtifacts
+[2026-11-09T13:59:17.457Z] Archiving artifacts
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (SonarQube)
+[Pipeline] dir
+[2026-11-09T13:59:18.158Z] Running in /var/jenkins_home/workspace/souverainrecrut-backend/backend
+[Pipeline] {
+[Pipeline] withSonarQubeEnv
+[2026-11-09T13:59:18.379Z] Injecting SonarQube environment variables using the configuration: sonarqube
+[Pipeline] {
+[Pipeline] tool
+[2026-11-09T13:59:23.699Z] Unpacking https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-8.4.0.16527.zip to /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner on Jenkins
+[Pipeline] sh
+[2026-11-09T13:59:30.955Z] + /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/bin/sonar-scanner -Dsonar.projectVersion=1.0.0
+[2026-11-09T13:59:32.301Z] 13:59:32.240 INFO  Scanner configuration file: /var/jenkins_home/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/conf/sonar-scanner.properties
+[2026-11-09T13:59:32.301Z] 13:59:32.253 INFO  Project root configuration file: /var/jenkins_home/workspace/souverainrecrut-backend/backend/sonar-project.properties
+[2026-11-09T13:59:32.553Z] 13:59:32.353 INFO  SonarScanner CLI 8.4.0.16527
+[2026-11-09T13:59:32.553Z] 13:59:32.376 INFO  Linux 6.18.54.1-microsoft-standard-WSL2 amd64
+[2026-11-09T13:59:42.433Z] 13:59:40.927 ERROR Failed to query server version: Call to URL [http://sonarqube:9000/api/v2/analysis/version] failed: null
+[2026-11-09T13:59:42.434Z] 13:59:40.927 INFO  EXECUTION FAILURE
+[2026-11-09T13:59:42.434Z] 13:59:40.928 INFO  Total time: 8.782s
+[Pipeline] }
+[2026-11-09T13:59:44.560Z] WARN: Unable to locate 'report-task.txt' in the workspace. Did the SonarScanner succeed?
+[Pipeline] // withSonarQubeEnv
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Quality Gate)
+Stage "Quality Gate" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build image)
+Stage "Build image" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Trivy scan)
+Stage "Trivy scan" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Docker Hub)
+Stage "Push Docker Hub" skipped due to earlier failure(s)
+[Pipeline] getContext
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] sh
+[2026-11-09T13:59:46.976Z] + docker logout
+[2026-11-09T13:59:46.976Z] Removing login credentials for https://index.docker.io/v1/
+[Pipeline] sh
+[2026-11-09T13:59:47.272Z] + docker image rm jogoat123/souverainrecrut-backend:1.0.0-03eeb89
+[2026-11-09T13:59:47.272Z] Error response from daemon: No such image: jogoat123/souverainrecrut-backend:1.0.0-03eeb89
+[2026-11-09T13:59:47.272Z] + true
+[Pipeline] cleanWs
+[2026-11-09T13:59:47.321Z] [WS-CLEANUP] Deleting project workspace...
+[2026-11-09T13:59:47.328Z] [WS-CLEANUP] Deferred wipeout is used...
+[2026-11-09T13:59:47.375Z] [WS-CLEANUP] done
+[Pipeline] echo
+[2026-11-09T13:59:47.420Z] Pipeline en échec : image NON publiée.
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE

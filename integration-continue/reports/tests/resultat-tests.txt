@@ -1,0 +1,198 @@
+PASS tests/candidates.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mGET /v1/candidates?page=2&limit=10 [32m200[0m 5.886 ms - 175[0m
+[0mGET /v1/candidates/c-1 [32m200[0m 1.773 ms - 112[0m
+[0mGET /v1/candidates/inconnu [33m404[0m 1.366 ms - 74[0m
+[0mPOST /v1/candidates [32m201[0m 2.248 ms - 112[0m
+[0mPOST /v1/candidates [33m409[0m 0.986 ms - 94[0m
+[0mPOST /v1/candidates [33m400[0m 2.195 ms - 226[0m
+[0mPUT /v1/candidates/c-1 [32m200[0m 1.375 ms - 112[0m
+[0mPUT /v1/candidates/inconnu [33m404[0m 0.658 ms - 74[0m
+[0mDELETE /v1/candidates/c-1 [32m200[0m 0.858 ms - 112[0m
+[0mPOST /v1/users [32m201[0m 65.230 ms - 200[0m
+PASS tests/users.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mPOST /v1/users [33m409[0m 2.039 ms - 83[0m
+[0mPOST /v1/users [33m400[0m 1.170 ms - 173[0m
+[0mGET /v1/users/u-2 [32m200[0m 1.031 ms - 144[0m
+[0mGET /v1/users/inconnu [33m404[0m 0.936 ms - 77[0m
+[0mPUT /v1/users/u-2 [32m200[0m 1.288 ms - 147[0m
+[0mDELETE /v1/users/u-2 [32m200[0m 0.909 ms - 144[0m
+PASS tests/jobs.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mGET /v1/jobs [32m200[0m 1.795 ms - 255[0m
+[0mGET /v1/jobs/j-1 [32m200[0m 1.187 ms - 193[0m
+[0mGET /v1/jobs/inconnue [33m404[0m 0.778 ms - 71[0m
+[0mPOST /v1/jobs [32m201[0m 1.670 ms - 193[0m
+[0mPOST /v1/jobs [33m400[0m 1.629 ms - 427[0m
+[0mPUT /v1/jobs/j-1 [32m200[0m 1.645 ms - 192[0m
+[0mPUT /v1/jobs/inconnue [33m404[0m 0.960 ms - 71[0m
+[0mDELETE /v1/jobs/j-1 [32m200[0m 0.855 ms - 193[0m
+[0mDELETE /v1/jobs/inconnue [33m404[0m 0.967 ms - 71[0m
+[0mGET /v1/applications [32m200[0m 3.307 ms - 151[0m
+[0mGET /v1/applications/a-1 [32m200[0m 0.930 ms - 89[0m
+[0mGET /v1/applications/inconnue [33m404[0m 1.306 ms - 77[0m
+[0mPOST /v1/applications [32m201[0m 1.809 ms - 89[0m
+[0mPOST /v1/applications [33m400[0m 1.334 ms - 254[0m
+[0mPUT /v1/applications/a-1 [32m200[0m 1.086 ms - 90[0m
+PASS tests/applications.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mPUT /v1/applications/a-1 [33m400[0m 1.048 ms - 200[0m
+[0mDELETE /v1/applications/a-1 [32m200[0m 0.992 ms - 89[0m
+PASS tests/auth.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+PASS tests/access-control.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mPOST /v1/auth/login [32m200[0m 3.713 ms - 403[0m
+[0mPOST /v1/auth/login [32m200[0m 2.842 ms - 403[0m
+[0mPOST /v1/auth/login [33m401[0m 1.096 ms - 84[0m
+[0mGET /v1/candidates [33m401[0m 0.764 ms - 78[0m
+[0mPOST /v1/auth/login [33m401[0m 2.126 ms - 84[0m
+[0mGET /v1/candidates [33m401[0m 0.375 ms - 68[0m
+[0mGET /v1/auth/me [32m200[0m 0.889 ms - 211[0m
+[0mGET /v1/candidates [33m401[0m 1.169 ms - 79[0m
+[0mGET /v1/auth/me [33m404[0m 0.640 ms - 77[0m
+[0mGET /v1/candidates [33m401[0m 0.870 ms - 79[0m
+[0mGET /v1/auth/me [33m401[0m 0.549 ms - 78[0m
+[0mGET /v1/candidates [32m200[0m 0.781 ms - 86[0m
+[0mDELETE /v1/candidates/c-1 [33m403[0m 0.700 ms - 95[0m
+[0mDELETE /v1/jobs/j-1 [33m403[0m 0.817 ms - 95[0m
+[0mDELETE /v1/applications/a-1 [33m403[0m 1.893 ms - 95[0m
+[0mGET /v1/users [33m403[0m 0.863 ms - 95[0m
+[0mGET /v1/users [32m200[0m 1.101 ms - 86[0m
+PASS tests/health.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+PASS tests/errors-and-utils.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+[0mGET / [32m200[0m 1.119 ms - 127[0m
+[0mGET /v1/info [32m200[0m 0.601 ms - 241[0m
+[0mGET /v1/health [32m200[0m 0.758 ms - 118[0m
+[0mGET /v1/ready [32m200[0m 0.744 ms - 104[0m
+[0mGET /v1/ready [31m503[0m 0.478 ms - 112[0m
+[0mGET /v1/health [32m200[0m 0.340 ms - 118[0m
+[0mGET /v1/route-inexistante [33m404[0m 0.484 ms - 93[0m
+[0mGET /v1/candidates/c-1 [31m500[0m 2.062 ms - 79[0m
+PASS tests/dashboard.test.ts
+  ● Console
+
+    console.log
+      ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+
+      at _log (node_modules/dotenv/lib/main.js:131:11)
+
+----------------------------|---------|----------|---------|---------|-------------------
+File                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------------------------|---------|----------|---------|---------|-------------------
+All files                   |     100 |    68.11 |     100 |     100 |                   
+ src                        |     100 |      100 |     100 |     100 |                   
+  app.ts                    |     100 |      100 |     100 |     100 |                   
+ src/config                 |     100 |    66.66 |     100 |     100 |                   
+  env.ts                    |     100 |    66.66 |     100 |     100 | 8-14              
+ src/controllers            |     100 |      100 |     100 |     100 |                   
+  application.controller.ts |     100 |      100 |     100 |     100 |                   
+  auth.controller.ts        |     100 |      100 |     100 |     100 |                   
+  candidate.controller.ts   |     100 |      100 |     100 |     100 |                   
+  dashboard.controller.ts   |     100 |      100 |     100 |     100 |                   
+  health.controller.ts      |     100 |      100 |     100 |     100 |                   
+  info.controller.ts        |     100 |      100 |     100 |     100 |                   
+  job.controller.ts         |     100 |      100 |     100 |     100 |                   
+  user.controller.ts        |     100 |      100 |     100 |     100 |                   
+ src/errors                 |     100 |        0 |     100 |     100 |                   
+  app.error.ts              |     100 |        0 |     100 |     100 | 9                 
+ src/middlewares            |     100 |    93.75 |     100 |     100 |                   
+  auth.middleware.ts        |     100 |      100 |     100 |     100 |                   
+  authorize.middleware.ts   |     100 |      100 |     100 |     100 |                   
+  cors.middleware.ts        |     100 |      100 |     100 |     100 |                   
+  error.middleware.ts       |     100 |      100 |     100 |     100 |                   
+  logger.middleware.ts      |     100 |       50 |     100 |     100 | 10                
+  not-found.middleware.ts   |     100 |      100 |     100 |     100 |                   
+  validate.middleware.ts    |     100 |      100 |     100 |     100 |                   
+ src/repositories           |     100 |        0 |     100 |     100 |                   
+  application.repository.ts |     100 |        0 |     100 |     100 | 13                
+  candidate.repository.ts   |     100 |        0 |     100 |     100 | 9                 
+  dashboard.repository.ts   |     100 |      100 |     100 |     100 |                   
+  job.repository.ts         |     100 |        0 |     100 |     100 | 9                 
+  user.repository.ts        |     100 |        0 |     100 |     100 | 9                 
+ src/routes                 |     100 |      100 |     100 |     100 |                   
+  application.routes.ts     |     100 |      100 |     100 |     100 |                   
+  auth.routes.ts            |     100 |      100 |     100 |     100 |                   
+  candidate.routes.ts       |     100 |      100 |     100 |     100 |                   
+  dashboard.routes.ts       |     100 |      100 |     100 |     100 |                   
+  health.routes.ts          |     100 |      100 |     100 |     100 |                   
+  index.ts                  |     100 |      100 |     100 |     100 |                   
+  info.routes.ts            |     100 |      100 |     100 |     100 |                   
+  job.routes.ts             |     100 |      100 |     100 |     100 |                   
+  user.routes.ts            |     100 |      100 |     100 |     100 |                   
+ src/services               |     100 |    69.23 |     100 |     100 |                   
+  application.service.ts    |     100 |       50 |     100 |     100 | 19                
+  auth.service.ts           |     100 |      100 |     100 |     100 |                   
+  candidate.service.ts      |     100 |    66.66 |     100 |     100 | 16                
+  dashboard.service.ts      |     100 |      100 |     100 |     100 |                   
+  health.service.ts         |     100 |      100 |     100 |     100 |                   
+  info.service.ts           |     100 |      100 |     100 |     100 |                   
+  job.service.ts            |     100 |       50 |     100 |     100 | 16                
+  user.service.ts           |     100 |       75 |     100 |     100 | 17                
+ src/utils                  |     100 |      100 |     100 |     100 |                   
+  async-handler.ts          |     100 |      100 |     100 |     100 |                   
+  pagination.ts             |     100 |      100 |     100 |     100 |                   
+ src/validators             |     100 |      100 |     100 |     100 |                   
+  application.schema.ts     |     100 |      100 |     100 |     100 |                   
+  candidate.schema.ts       |     100 |      100 |     100 |     100 |                   
+  job.schema.ts             |     100 |      100 |     100 |     100 |                   
+  user.schema.ts            |     100 |      100 |     100 |     100 |                   
+----------------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 9 passed, 9 total
+Tests:       65 passed, 65 total
+Snapshots:   0 total
+Time:        4.092 s, estimated 18 s
+Ran all test suites.
+[0mGET /v1/dashboard/stats [32m200[0m 2.289 ms - 101[0m

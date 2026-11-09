@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="65" failures="0" errors="0" time="3.879">
+  <testsuite name="Candidats – /v1/candidates" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:01" time="1.691" tests="9">
+    <testcase classname="Candidats – /v1/candidates GET / liste les candidats avec la pagination" name="Candidats – /v1/candidates GET / liste les candidats avec la pagination" time="0.056">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates GET /:id renvoie un candidat existant" name="Candidats – /v1/candidates GET /:id renvoie un candidat existant" time="0.01">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates GET /:id renvoie 404 pour un candidat inexistant" name="Candidats – /v1/candidates GET /:id renvoie 404 pour un candidat inexistant" time="0.007">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates POST / crée un candidat (201) et met l&apos;email en minuscules" name="Candidats – /v1/candidates POST / crée un candidat (201) et met l&apos;email en minuscules" time="0.02">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates POST / refuse un email déjà utilisé (409)" name="Candidats – /v1/candidates POST / refuse un email déjà utilisé (409)" time="0.006">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates POST / refuse des données invalides (400) avec le détail des champs" name="Candidats – /v1/candidates POST / refuse des données invalides (400) avec le détail des champs" time="0.008">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates PUT /:id met à jour un candidat existant" name="Candidats – /v1/candidates PUT /:id met à jour un candidat existant" time="0.007">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates PUT /:id renvoie 404 pour un candidat inexistant" name="Candidats – /v1/candidates PUT /:id renvoie 404 pour un candidat inexistant" time="0.005">
+    </testcase>
+    <testcase classname="Candidats – /v1/candidates DELETE /:id supprime un candidat (ADMIN)" name="Candidats – /v1/candidates DELETE /:id supprime un candidat (ADMIN)" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Utilisateurs – /v1/users (ADMIN uniquement)" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:01" time="1.788" tests="7">
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) POST / crée un utilisateur et hache son mot de passe avec bcrypt" name="Utilisateurs – /v1/users (ADMIN uniquement) POST / crée un utilisateur et hache son mot de passe avec bcrypt" time="0.185">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) POST / refuse un email déjà utilisé (409)" name="Utilisateurs – /v1/users (ADMIN uniquement) POST / refuse un email déjà utilisé (409)" time="0.009">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) POST / refuse un mot de passe trop court (400)" name="Utilisateurs – /v1/users (ADMIN uniquement) POST / refuse un mot de passe trop court (400)" time="0.006">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) GET /:id renvoie un utilisateur existant" name="Utilisateurs – /v1/users (ADMIN uniquement) GET /:id renvoie un utilisateur existant" time="0.005">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) GET /:id renvoie 404 pour un utilisateur inexistant" name="Utilisateurs – /v1/users (ADMIN uniquement) GET /:id renvoie 404 pour un utilisateur inexistant" time="0.006">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) PUT /:id met à jour un utilisateur" name="Utilisateurs – /v1/users (ADMIN uniquement) PUT /:id met à jour un utilisateur" time="0.006">
+    </testcase>
+    <testcase classname="Utilisateurs – /v1/users (ADMIN uniquement) DELETE /:id supprime un utilisateur" name="Utilisateurs – /v1/users (ADMIN uniquement) DELETE /:id supprime un utilisateur" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Offres – /v1/jobs" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:02" time="0.368" tests="9">
+    <testcase classname="Offres – /v1/jobs GET / liste les offres avec la pagination par défaut" name="Offres – /v1/jobs GET / liste les offres avec la pagination par défaut" time="0.018">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs GET /:id renvoie une offre existante" name="Offres – /v1/jobs GET /:id renvoie une offre existante" time="0.007">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs GET /:id renvoie 404 pour une offre inexistante" name="Offres – /v1/jobs GET /:id renvoie 404 pour une offre inexistante" time="0.005">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs POST / crée une offre (201)" name="Offres – /v1/jobs POST / crée une offre (201)" time="0.011">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs POST / refuse une offre incomplète (400)" name="Offres – /v1/jobs POST / refuse une offre incomplète (400)" time="0.008">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs PUT /:id met à jour une offre existante" name="Offres – /v1/jobs PUT /:id met à jour une offre existante" time="0.008">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs PUT /:id renvoie 404 pour une offre inexistante" name="Offres – /v1/jobs PUT /:id renvoie 404 pour une offre inexistante" time="0.006">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs DELETE /:id supprime une offre (ADMIN)" name="Offres – /v1/jobs DELETE /:id supprime une offre (ADMIN)" time="0.005">
+    </testcase>
+    <testcase classname="Offres – /v1/jobs DELETE /:id renvoie 404 pour une offre inexistante" name="Offres – /v1/jobs DELETE /:id renvoie 404 pour une offre inexistante" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="Candidatures – /v1/applications" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:02" time="0.337" tests="9">
+    <testcase classname="Candidatures – /v1/applications GET / liste les candidatures avec le candidat et l&apos;offre associés" name="Candidatures – /v1/applications GET / liste les candidatures avec le candidat et l&apos;offre associés" time="0.011">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications GET /:id renvoie une candidature existante" name="Candidatures – /v1/applications GET /:id renvoie une candidature existante" time="0.006">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications GET /:id renvoie 404 pour une candidature inexistante" name="Candidatures – /v1/applications GET /:id renvoie 404 pour une candidature inexistante" time="0.008">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications POST / crée une candidature (201)" name="Candidatures – /v1/applications POST / crée une candidature (201)" time="0.013">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications POST / refuse une candidature sans candidat ni offre (400)" name="Candidatures – /v1/applications POST / refuse une candidature sans candidat ni offre (400)" time="0.007">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications PUT /:id change le statut d&apos;une candidature" name="Candidatures – /v1/applications PUT /:id change le statut d&apos;une candidature" time="0.006">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications PUT /:id refuse un statut qui n&apos;existe pas (400)" name="Candidatures – /v1/applications PUT /:id refuse un statut qui n&apos;existe pas (400)" time="0.005">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications DELETE /:id supprime une candidature (ADMIN)" name="Candidatures – /v1/applications DELETE /:id supprime une candidature (ADMIN)" time="0.006">
+    </testcase>
+    <testcase classname="Candidatures – /v1/applications ApplicationService.updateStatus met à jour uniquement le statut" name="Candidatures – /v1/applications ApplicationService.updateStatus met à jour uniquement le statut" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="POST /v1/auth/login" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:03" time="0.27" tests="7">
+    <testcase classname="POST /v1/auth/login connecte un utilisateur avec des identifiants valides et renvoie un JWT" name="POST /v1/auth/login connecte un utilisateur avec des identifiants valides et renvoie un JWT" time="0.011">
+    </testcase>
+    <testcase classname="POST /v1/auth/login ne renvoie jamais le mot de passe dans la réponse" name="POST /v1/auth/login ne renvoie jamais le mot de passe dans la réponse" time="0.009">
+    </testcase>
+    <testcase classname="POST /v1/auth/login refuse un email inconnu (401)" name="POST /v1/auth/login refuse un email inconnu (401)" time="0.009">
+    </testcase>
+    <testcase classname="POST /v1/auth/login refuse un mauvais mot de passe (401) avec le même message" name="POST /v1/auth/login refuse un mauvais mot de passe (401) avec le même message" time="0.006">
+    </testcase>
+    <testcase classname="GET /v1/auth/me renvoie le profil de l&apos;utilisateur connecté" name="GET /v1/auth/me renvoie le profil de l&apos;utilisateur connecté" time="0.004">
+    </testcase>
+    <testcase classname="GET /v1/auth/me renvoie 404 si l&apos;utilisateur du token n&apos;existe plus" name="GET /v1/auth/me renvoie 404 si l&apos;utilisateur du token n&apos;existe plus" time="0.004">
+    </testcase>
+    <testcase classname="GET /v1/auth/me renvoie 401 sans token" name="GET /v1/auth/me renvoie 401 sans token" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Authentification (auth.middleware)" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:03" time="0.243" tests="11">
+    <testcase classname="Authentification (auth.middleware) refuse une requête sans en-tête Authorization (401)" name="Authentification (auth.middleware) refuse une requête sans en-tête Authorization (401)" time="0.013">
+    </testcase>
+    <testcase classname="Authentification (auth.middleware) refuse un en-tête qui n&apos;est pas de type Bearer (401)" name="Authentification (auth.middleware) refuse un en-tête qui n&apos;est pas de type Bearer (401)" time="0.004">
+    </testcase>
+    <testcase classname="Authentification (auth.middleware) refuse un token signé avec un autre secret (401)" name="Authentification (auth.middleware) refuse un token signé avec un autre secret (401)" time="0.005">
+    </testcase>
+    <testcase classname="Authentification (auth.middleware) refuse un token expiré (401)" name="Authentification (auth.middleware) refuse un token expiré (401)" time="0.005">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un RECRUITER peut lister les candidats" name="Autorisation par rôle (authorize.middleware) un RECRUITER peut lister les candidats" time="0.004">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer un candidat (403)" name="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer un candidat (403)" time="0.004">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer une offre (403)" name="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer une offre (403)" time="0.005">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer une candidature (403)" name="Autorisation par rôle (authorize.middleware) un RECRUITER ne peut pas supprimer une candidature (403)" time="0.007">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un RECRUITER n&apos;a pas accès à la gestion des utilisateurs (403)" name="Autorisation par rôle (authorize.middleware) un RECRUITER n&apos;a pas accès à la gestion des utilisateurs (403)" time="0.006">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) un ADMIN a accès à la gestion des utilisateurs" name="Autorisation par rôle (authorize.middleware) un ADMIN a accès à la gestion des utilisateurs" time="0.006">
+    </testcase>
+    <testcase classname="Autorisation par rôle (authorize.middleware) authorize() renvoie 401 si aucun utilisateur n&apos;est attaché à la requête" name="Autorisation par rôle (authorize.middleware) authorize() renvoie 401 si aucun utilisateur n&apos;est attaché à la requête" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Routes publiques et supervision" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:03" time="0.254" tests="7">
+    <testcase classname="Routes publiques et supervision GET / renvoie le message d&apos;accueil de l&apos;API" name="Routes publiques et supervision GET / renvoie le message d&apos;accueil de l&apos;API" time="0.009">
+    </testcase>
+    <testcase classname="Routes publiques et supervision GET /v1/info renvoie les informations de l&apos;API" name="Routes publiques et supervision GET /v1/info renvoie les informations de l&apos;API" time="0.007">
+    </testcase>
+    <testcase classname="Routes publiques et supervision GET /v1/health renvoie 200 et le statut UP" name="Routes publiques et supervision GET /v1/health renvoie 200 et le statut UP" time="0.006">
+    </testcase>
+    <testcase classname="Routes publiques et supervision GET /v1/ready renvoie 200 quand la base répond" name="Routes publiques et supervision GET /v1/ready renvoie 200 quand la base répond" time="0.005">
+    </testcase>
+    <testcase classname="Routes publiques et supervision GET /v1/ready renvoie 503 quand la base est indisponible" name="Routes publiques et supervision GET /v1/ready renvoie 503 quand la base est indisponible" time="0.02">
+    </testcase>
+    <testcase classname="Routes publiques et supervision ne révèle pas la technologie du serveur (pas d&apos;en-tête X-Powered-By)" name="Routes publiques et supervision ne révèle pas la technologie du serveur (pas d&apos;en-tête X-Powered-By)" time="0.005">
+    </testcase>
+    <testcase classname="Routes publiques et supervision une route inconnue renvoie 404" name="Routes publiques et supervision une route inconnue renvoie 404" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Gestion des erreurs (error.middleware)" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:03" time="0.233" tests="5">
+    <testcase classname="Gestion des erreurs (error.middleware) une erreur inattendue renvoie 500 sans exposer le détail technique" name="Gestion des erreurs (error.middleware) une erreur inattendue renvoie 500 sans exposer le détail technique" time="0.011">
+    </testcase>
+    <testcase classname="Pagination (utils/pagination) utilise page=1 et limit=10 par défaut" name="Pagination (utils/pagination) utilise page=1 et limit=10 par défaut" time="0.001">
+    </testcase>
+    <testcase classname="Pagination (utils/pagination) calcule le décalage (skip) à partir de la page" name="Pagination (utils/pagination) calcule le décalage (skip) à partir de la page" time="0">
+    </testcase>
+    <testcase classname="Pagination (utils/pagination) borne les valeurs : page ≥ 1, limit entre 1 et 100" name="Pagination (utils/pagination) borne les valeurs : page ≥ 1, limit entre 1 et 100" time="0">
+    </testcase>
+    <testcase classname="Pagination (utils/pagination) calcule le nombre total de pages" name="Pagination (utils/pagination) calcule le nombre total de pages" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Tableau de bord – /v1/dashboard/stats" errors="0" failures="0" skipped="0" timestamp="2026-11-09T14:39:03" time="0.266" tests="1">
+    <testcase classname="Tableau de bord – /v1/dashboard/stats renvoie les compteurs globaux et les candidatures en attente" name="Tableau de bord – /v1/dashboard/stats renvoie les compteurs globaux et les candidatures en attente" time="0.01">
+    </testcase>
+  </testsuite>
+</testsuites>
