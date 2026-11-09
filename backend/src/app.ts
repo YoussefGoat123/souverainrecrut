@@ -15,6 +15,13 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 const app = express();
 
 /**
+ * Sécurité : ne pas révéler la technologie du serveur.
+ * Par défaut, Express ajoute l'en-tête "X-Powered-By: Express",
+ * qui aide un attaquant à cibler des failles connues (règle Sonar S5689).
+ */
+app.disable("x-powered-by");
+
+/**
  * ==========================================
  * Global Middlewares
  * ==========================================

@@ -53,6 +53,12 @@ describe("Routes publiques et supervision", () => {
     expect(res.body.data.database).toBe("DISCONNECTED");
   });
 
+  it("ne révèle pas la technologie du serveur (pas d'en-tête X-Powered-By)", async () => {
+    const res = await request(app).get("/v1/health");
+
+    expect(res.headers["x-powered-by"]).toBeUndefined();
+  });
+
   it("une route inconnue renvoie 404", async () => {
     const res = await request(app).get("/v1/route-inexistante");
 

@@ -6,3 +6,6 @@ node_modules
 
 coverage/
 
+
+# Fichiers temporaires du scanner SonarQube
+.scannerwork/
