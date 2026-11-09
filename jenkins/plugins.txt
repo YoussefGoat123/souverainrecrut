@@ -1,0 +1,12 @@
+# Récupération du code depuis GitHub
+git
+# Pipelines déclaratifs (Jenkinsfile) + vue des étapes
+workflow-aggregator
+pipeline-stage-view
+# Injection des secrets dans le pipeline (withCredentials)
+credentials-binding
+# Intégration SonarQube (withSonarQubeEnv, waitForQualityGate)
+sonar
+# Confort : horodatage des logs, nettoyage de l'espace de travail
+timestamper
+ws-cleanup

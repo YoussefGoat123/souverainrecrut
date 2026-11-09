@@ -1,0 +1,33 @@
+# ==========================================
+# Jenkins – lancement local
+# ==========================================
+# Usage (depuis le dossier jenkins/) :
+#   docker compose up -d --build
+#   docker compose logs -f jenkins
+services:
+  jenkins:
+    build: .
+    image: souverainrecrut-jenkins:1.0
+    container_name: jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      # Configuration, jobs et historique conservés entre les redémarrages
+      - jenkins_home:/var/jenkins_home
+      # Jenkins pilote le moteur Docker de l'hôte (build et push des images)
+      - /var/run/docker.sock:/var/run/docker.sock
+    # Le socket Docker appartient au groupe root (gid 0, droits rw-rw----) :
+    # on ajoute ce groupe à l'utilisateur jenkins au lieu de lancer Jenkins en root.
+    group_add:
+      - "0"
+    networks:
+      # Même réseau que SonarQube : Jenkins le joint via http://sonarqube:9000
+      - cicd-net
+
+networks:
+  cicd-net:
+    external: true
+
+volumes:
+  jenkins_home:
