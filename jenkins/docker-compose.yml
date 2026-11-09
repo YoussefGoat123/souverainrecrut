@@ -10,6 +10,9 @@ services:
     image: souverainrecrut-jenkins:1.0
     container_name: jenkins
     restart: unless-stopped
+    environment:
+      # Mémoire limitée : la machine n'a que ~3 Go pour Docker (SonarQube + Jenkins + builds)
+      JAVA_OPTS: "-Xmx768m"
     ports:
       - "8080:8080"
     volumes:

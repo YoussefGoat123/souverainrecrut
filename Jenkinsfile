@@ -68,7 +68,9 @@ pipeline {
     stage('Tests') {
       steps {
         dir('backend') {
-          sh 'npm run test:coverage'
+          // 2 workers Jest maximum : par défaut Jest lance (nb de CPU - 1) processus,
+          // ce qui sature la mémoire de la machine et peut faire tomber SonarQube (OOM).
+          sh 'npm run test:coverage -- --maxWorkers=2'
         }
       }
       post {
