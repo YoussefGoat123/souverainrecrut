@@ -60,12 +60,19 @@ default:
     API_VERSION=v1
     API_PORT=${API_PORT}
     EOF
-  # 3. Récupération de l'image depuis Docker Hub (pas de reconstruction) et (re)démarrage
+  # 3. Sauvegarde de la base avant toute migration (si PostgreSQL tourne déjà)
+  - |
+    $SSH "cd $DEPLOY_DIR && mkdir -p backups && chmod 700 backups && \
+      if docker compose ps --status running --services 2>/dev/null | grep -qx db; then \
+        docker compose exec -T db pg_dump -U $POSTGRES_USER $POSTGRES_DB | gzip > backups/avant-${TARGET_TAG}-$(date -u +%Y%m%dT%H%M%SZ).sql.gz && \
+        ls -1t backups | head -1; \
+      else echo 'Premier déploiement : pas de base à sauvegarder'; fi"
+  # 4. Récupération de l'image depuis Docker Hub (pas de reconstruction) et (re)démarrage
   # Le token est envoyé sur l'entrée standard : jamais en argument de commande ni dans les logs
   - echo "$DOCKERHUB_TOKEN" | $SSH "docker login -u '$DOCKERHUB_USER' --password-stdin >/dev/null"
   - $SSH "cd $DEPLOY_DIR && docker compose pull --quiet && docker compose up -d --remove-orphans"
   - $SSH "docker logout >/dev/null"
-  # 4. Historique des déploiements (sert au rollback)
+  # 5. Historique des déploiements (sert au rollback)
   - $SSH "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) ${TARGET_TAG} pipeline=${CI_PIPELINE_ID} par=${GITLAB_USER_LOGIN}\" >> $DEPLOY_DIR/deploy-history.log"
 
 # ---------- 1. Validation ----------
@@ -75,7 +82,7 @@ validate-tag:
     - apk add --no-cache curl >/dev/null
     - test -n "$BACKEND_TAG" || { echo "BACKEND_TAG non défini"; exit 1; }
     # Format imposé : version sémantique + commit court (ex. 1.0.0-a1b2c3d)
-    - echo "$BACKEND_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide : $BACKEND_TAG"; exit 1; }
+    - echo "$BACKEND_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide - $BACKEND_TAG"; exit 1; }
     # Le tag doit exister sur Docker Hub (publié par Jenkins)
     - code=$(curl -s -o /dev/null -w "%{http_code}" "https://hub.docker.com/v2/repositories/${BACKEND_IMAGE}/tags/${BACKEND_TAG}")
     - test "$code" = "200" || { echo "Tag ${BACKEND_TAG} introuvable sur Docker Hub (HTTP $code)"; exit 1; }
@@ -130,7 +137,7 @@ rollback-production:
         ROLLBACK_TAG=$($SSH "awk '{print \$2}' $DEPLOY_DIR/deploy-history.log | uniq | tail -2 | head -1")
       fi
       test -n "$ROLLBACK_TAG" || { echo "Aucune version précédente trouvée"; exit 1; }
-      echo "$ROLLBACK_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide : $ROLLBACK_TAG"; exit 1; }
+      echo "$ROLLBACK_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide - $ROLLBACK_TAG"; exit 1; }
       export TARGET_TAG="$ROLLBACK_TAG"
     - *deploy_script
     - sleep 20
