@@ -1,0 +1,2 @@
+# Copier en terraform.tfvars et adapter (terraform.tfvars n'est pas versionné).
+server_ip = "192.168.13.129"
