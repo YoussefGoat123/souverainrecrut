@@ -51,3 +51,19 @@ prisma/dev.db
 
 process/
 cours/
+
+# ==========================
+# Déploiement : états et secrets
+# ==========================
+deploiement/terraform/.terraform/
+deploiement/terraform/*.tfstate
+deploiement/terraform/*.tfstate.*
+deploiement/terraform/terraform.tfvars
+deploiement/deployment/.env
+deploiement/terraform/infrastructure.json
+
+# ==========================
+# Ressources locales volumineuses (ISO, installateurs)
+# ==========================
+ressources/
+*.iso
