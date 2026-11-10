@@ -1,0 +1,138 @@
+# ==========================================================
+# Pipeline de déploiement – SouverainRecrut Backend
+# ==========================================================
+# validate -> deploy (approbation manuelle) -> verify      | rollback (manuel)
+#
+# L'image n'est jamais reconstruite : on déploie le tag publié par Jenkins sur Docker Hub.
+#
+# Variables CI/CD à définir dans GitLab (Settings > CI/CD > Variables), masquées/protégées :
+#   SERVER_HOST          IP du serveur (ex. 192.168.13.129)
+#   SERVER_USER          utilisateur SSH (deploy)
+#   SSH_PRIVATE_KEY      clé privée de déploiement            (type File, protégée)
+#   SSH_KNOWN_HOSTS      empreinte du serveur (ssh-keyscan)   (type File)
+#   DOCKERHUB_USER       identifiant Docker Hub
+#   DOCKERHUB_TOKEN      access token Docker Hub (lecture)    (masquée, protégée)
+#   POSTGRES_PASSWORD    mot de passe PostgreSQL              (masquée, protégée)
+#   JWT_SECRET           secret JWT                           (masquée, protégée)
+#   BACKEND_TAG          tag de l'image à déployer (ex. 1.0.0-a1b2c3d) – modifiable au lancement
+
+stages:
+  - validate
+  - deploy
+  - verify
+
+variables:
+  BACKEND_IMAGE: "jogoat123/souverainrecrut-backend"
+  DEPLOY_DIR: "/opt/souverainrecrut"
+  API_PORT: "4000"
+  POSTGRES_USER: "souverainrecrut"
+  POSTGRES_DB: "souverainrecrut"
+
+default:
+  image: alpine:3.20
+  # Runner GitLab installé localement (le serveur est sur un réseau privé NAT,
+  # injoignable par les runners partagés de gitlab.com)
+  tags:
+    - souverainrecrut
+
+# ---------- Briques réutilisables ----------
+.ssh_setup: &ssh_setup
+  - apk add --no-cache openssh-client curl >/dev/null
+  - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+  - cp "$SSH_PRIVATE_KEY" ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+  - cp "$SSH_KNOWN_HOSTS" ~/.ssh/known_hosts && chmod 644 ~/.ssh/known_hosts
+  - export SSH="ssh -i $HOME/.ssh/id_deploy -o BatchMode=yes $SERVER_USER@$SERVER_HOST"
+
+# Déploie le tag contenu dans $TARGET_TAG (utilisé par deploy et rollback)
+.deploy_script: &deploy_script
+  - echo "Déploiement de ${BACKEND_IMAGE}:${TARGET_TAG} sur ${SERVER_HOST}"
+  # 1. Fichier Compose (versionné) -> serveur
+  - scp -i ~/.ssh/id_deploy -o BatchMode=yes deployment/docker-compose.yml "$SERVER_USER@$SERVER_HOST:$DEPLOY_DIR/docker-compose.yml"
+  # 2. Fichier .env généré à partir des variables GitLab, transmis par SSH sans être affiché
+  - |
+    $SSH "umask 077 && cat > $DEPLOY_DIR/.env" <<EOF
+    BACKEND_IMAGE=${BACKEND_IMAGE}
+    BACKEND_TAG=${TARGET_TAG}
+    POSTGRES_USER=${POSTGRES_USER}
+    POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    POSTGRES_DB=${POSTGRES_DB}
+    JWT_SECRET=${JWT_SECRET}
+    API_VERSION=v1
+    API_PORT=${API_PORT}
+    EOF
+  # 3. Récupération de l'image depuis Docker Hub (pas de reconstruction) et (re)démarrage
+  # Le token est envoyé sur l'entrée standard : jamais en argument de commande ni dans les logs
+  - echo "$DOCKERHUB_TOKEN" | $SSH "docker login -u '$DOCKERHUB_USER' --password-stdin >/dev/null"
+  - $SSH "cd $DEPLOY_DIR && docker compose pull --quiet && docker compose up -d --remove-orphans"
+  - $SSH "docker logout >/dev/null"
+  # 4. Historique des déploiements (sert au rollback)
+  - $SSH "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) ${TARGET_TAG} pipeline=${CI_PIPELINE_ID} par=${GITLAB_USER_LOGIN}\" >> $DEPLOY_DIR/deploy-history.log"
+
+# ---------- 1. Validation ----------
+validate-tag:
+  stage: validate
+  script:
+    - apk add --no-cache curl >/dev/null
+    - test -n "$BACKEND_TAG" || { echo "BACKEND_TAG non défini"; exit 1; }
+    # Format imposé : version sémantique + commit court (ex. 1.0.0-a1b2c3d)
+    - echo "$BACKEND_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide : $BACKEND_TAG"; exit 1; }
+    # Le tag doit exister sur Docker Hub (publié par Jenkins)
+    - code=$(curl -s -o /dev/null -w "%{http_code}" "https://hub.docker.com/v2/repositories/${BACKEND_IMAGE}/tags/${BACKEND_TAG}")
+    - test "$code" = "200" || { echo "Tag ${BACKEND_TAG} introuvable sur Docker Hub (HTTP $code)"; exit 1; }
+    - echo "Tag ${BACKEND_TAG} valide et publié."
+
+# ---------- 2. Déploiement (approbation manuelle) ----------
+deploy-production:
+  stage: deploy
+  needs: [validate-tag]
+  when: manual
+  allow_failure: false
+  environment:
+    name: production
+    url: http://$SERVER_HOST:$API_PORT/v1/health
+  variables:
+    TARGET_TAG: $BACKEND_TAG
+  before_script: *ssh_setup
+  script: *deploy_script
+  resource_group: production
+
+# ---------- 3. Vérification ----------
+verify-deployment:
+  stage: verify
+  needs: [deploy-production]
+  before_script: *ssh_setup
+  script:
+    - $SSH "cd $DEPLOY_DIR && docker compose ps"
+    # Attente du statut "healthy" de l'API (healthcheck Docker)
+    - |
+      for i in $(seq 1 20); do
+        status=$($SSH "docker inspect -f '{{.State.Health.Status}}' souverainrecrut-api-1" || true)
+        echo "api: $status"; [ "$status" = "healthy" ] && break; sleep 5
+      done
+      [ "$status" = "healthy" ] || { $SSH "cd $DEPLOY_DIR && docker compose logs --tail=50 api"; exit 1; }
+    # Vérifications fonctionnelles depuis le réseau
+    - curl -fsS "http://$SERVER_HOST:$API_PORT/v1/health"
+    - curl -fsS "http://$SERVER_HOST:$API_PORT/v1/ready" | grep -q '"CONNECTED"'
+    - $SSH "docker inspect -f '{{.Config.Image}}' souverainrecrut-api-1" | grep -q ":${BACKEND_TAG}$"
+    - echo "API ${BACKEND_TAG} en ligne et connectée à PostgreSQL."
+
+# ---------- Rollback (manuel) ----------
+# Redéploie la version précédente lue dans l'historique du serveur, ou ROLLBACK_TAG si fourni.
+rollback-production:
+  stage: deploy
+  when: manual
+  environment:
+    name: production
+  before_script: *ssh_setup
+  script:
+    - |
+      if [ -z "$ROLLBACK_TAG" ]; then
+        ROLLBACK_TAG=$($SSH "awk '{print \$2}' $DEPLOY_DIR/deploy-history.log | uniq | tail -2 | head -1")
+      fi
+      test -n "$ROLLBACK_TAG" || { echo "Aucune version précédente trouvée"; exit 1; }
+      echo "$ROLLBACK_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-[0-9a-f]{7}$' || { echo "Tag invalide : $ROLLBACK_TAG"; exit 1; }
+      export TARGET_TAG="$ROLLBACK_TAG"
+    - *deploy_script
+    - sleep 20
+    - curl -fsS "http://$SERVER_HOST:$API_PORT/v1/health"
+  resource_group: production
