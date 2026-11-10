@@ -110,6 +110,12 @@ absence de `.dockerignore`.
 - **Credentials** : `sonar-token` (User Token dédié) et `dockerhub` (Personal Access Token
   Read & Write) ; aucun secret dans le dépôt.
 
+![Credentials Jenkins : valeurs masquées](captures/12-jenkins-credentials.png)
+
+Webhook SonarQube vers Jenkins, dernière livraison en succès (résultat du Quality Gate renvoyé à la pipeline) :
+
+![Webhook SonarQube vers Jenkins](captures/14-sonarqube-webhook.png)
+
 ### 3.5 Pipeline (Jenkinsfile)
 Checkout de `Dev` → `npm ci` → `prisma generate` → tests (JUnit + couverture) → analyse SonarQube →
 **Quality Gate bloquant** → build de l'image → **Trivy bloquant** → push Docker Hub.
@@ -121,6 +127,19 @@ Build #1 arrêté à l'étape SonarQube (incident 8) : les étapes suivantes son
 n'est publiée**. Build #2, après correction : toutes les étapes en succès, image publiée.
 
 ![Build #1 en échec, build #2 vert de bout en bout](captures/09-jenkins-build-1-echec-build-2-succes.png)
+
+Page du job : Quality Gate SonarQube **Passed** remonté dans Jenkins, historique des 65 tests sur tous
+les builds.
+
+![Job Jenkins : Quality Gate Passed et tendance des tests](captures/13-jenkins-job-quality-gate-tests.png)
+
+Résultats des tests publiés par Jenkins (rapport JUnit) : 65 tests, aucun échec.
+
+![Résultats des tests dans Jenkins](captures/10-jenkins-test-result.png)
+
+Rapport Trivy archivé par le build (image `1.1.0-4371f31`) :
+
+![Rapport Trivy archivé dans Jenkins](captures/11-jenkins-artefacts-trivy.png)
 
 ### 3.6 Image Docker et publication
 Dockerfile du Backend revu :
@@ -145,6 +164,8 @@ imposées par Prisma ; risque accepté et documenté, correction = montée de ve
 **Publication** : `jogoat123/souverainrecrut-backend:1.0.0-2d7e00c` – le tag associe la version
 applicative (`1.0.0`) et le commit (`2d7e00c`). Après le correctif des migrations Prisma (incident 13),
 le build #6 a publié **`1.0.0-fc7bb2c`**, version déployée en production.
+
+![Tags versionnés publiés sur Docker Hub](captures/15-dockerhub-tags.png)
 
 ## 4. Résultats de la partie 1
 
@@ -204,7 +225,12 @@ conditions réelles (« Manuel » avant « Automatisé ») : il a été détect�
 - SSH vérifié depuis Windows, accès Internet vérifié, système mis à jour, disque étendu à 28 Go.
 - Clé SSH **dédiée** au déploiement (ed25519), créée sur le poste, droits restreints, authentification
   sans mot de passe vérifiée.
-- Snapshot `01-ubuntu-installe-a-jour` pris **avant** toute configuration.
+- Snapshot `01-ubuntu-installe-a-jour` pris **avant** toute configuration :
+  ```
+  > vmrun listSnapshots souverainrecrut-srv.vmx
+  Total snapshots: 1
+  01-ubuntu-installe-a-jour
+  ```
 - ESXi abandonné (incident 9) : justification technique dans [`architecture.md`](architecture.md).
 
 ![ESXi : virtualisation imbriquée AMD-V non supportée](captures/16-vmware-esxi-amd-v-non-supporte.png)
@@ -272,6 +298,14 @@ privé. L'image n'est jamais reconstruite.
 ![Pipeline de déploiement : validation en cours](captures/25-gitlab-pipeline-en-cours.png)
 
 ![Validation et déploiement approuvé réussis, vérification en cours](captures/26-gitlab-pipeline-deploiement-reussi.png)
+
+Pipeline terminé : validation, déploiement et vérification en succès.
+
+![Pipeline de déploiement complet en succès](captures/27-gitlab-pipeline-complet.png)
+
+Variables CI/CD : secrets masqués, variables protégées, clé SSH et `known_hosts` en type *File*.
+
+![Variables CI/CD GitLab (valeurs masquées)](captures/22-gitlab-variables.png)
 
 ### 7.6 Vérification et rollback (§5.4)
 Procédure : [`procedure-rollback.md`](procedure-rollback.md). Version précédente identifiée par

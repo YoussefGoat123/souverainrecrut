@@ -16,6 +16,12 @@ Avant d'ajouter une capture : vérifier qu'aucun token, mot de passe ou clé n'e
 | `07-sonarqube-analyse-finale-passed.png` | SonarQube | Analyse finale Passed avec le gate personnalisé |
 | `08-jenkins-build-1-en-cours.png` | Jenkins | Premier build en cours (Stage View) |
 | `09-jenkins-build-1-echec-build-2-succes.png` | Jenkins | Build #1 en échec (rien publié), build #2 vert de bout en bout |
+| `10-jenkins-test-result.png` | Jenkins | Résultats des tests du build #8 : 65 tests, aucun échec |
+| `11-jenkins-artefacts-trivy.png` | Jenkins | Rapport Trivy archivé (image `1.1.0-4371f31`) |
+| `12-jenkins-credentials.png` | Jenkins | Credentials `sonar-token` et `dockerhub` (valeurs masquées) |
+| `13-jenkins-job-quality-gate-tests.png` | Jenkins | Page du job : Quality Gate SonarQube Passed, tendance des 65 tests |
+| `14-sonarqube-webhook.png` | SonarQube | Webhook `jenkins`, dernière livraison en succès |
+| `15-dockerhub-tags.png` | Docker Hub | Tags `1.0.0-fc7bb2c` et `1.0.0-ad9b7e5` publiés par Jenkins, commandes `docker pull` |
 | `16-vmware-esxi-amd-v-non-supporte.png` | VMware | ESXi : virtualisation imbriquée AMD-V indisponible (justifie l'abandon d'ESXi) |
 | `17-vm-ubuntu-24.04-connexion.png` | VM | Ubuntu Server 24.04.3 installé, connexion, IP 192.168.13.129 |
 | `18-vm-ubuntu-ip-et-acces-internet.png` | VM | `ip a` et `ping ubuntu.com` : réseau et accès Internet |
@@ -25,20 +31,15 @@ Avant d'ajouter une capture : vérifier qu'aucun token, mot de passe ou clé n'e
 | `24-gitlab-runner-enregistre.png` | GitLab | Enregistrement du runner sur le serveur (jeton saisi masqué), `is valid`, service actif |
 | `25-gitlab-pipeline-en-cours.png` | GitLab | Pipeline #3049956923 : validate → deploy → verify, `validate-tag` en cours |
 | `26-gitlab-pipeline-deploiement-reussi.png` | GitLab | `validate-tag` et `deploy-production` (approuvé) réussis, `verify-deployment` en cours |
+| `22-gitlab-variables.png` | GitLab | Variables CI/CD : valeurs masquées, Protected / Masked / File |
+| `27-gitlab-pipeline-complet.png` | GitLab | Pipeline #3049956923 terminé : validate, deploy, verify en succès |
+
+Snapshot VMware : preuve textuelle (`vmrun listSnapshots`) dans le rapport, section 7.1.
 
 ## À ajouter
 
 | Nom suggéré | Où la prendre |
 |---|---|
-| `10-jenkins-test-result.png` | Jenkins → dernier build → *Test Result* (65 tests) |
-| `11-jenkins-artefacts-trivy.png` | Jenkins → dernier build → artefacts `trivy-report.txt` |
-| `12-jenkins-credentials.png` | Manage Jenkins → Credentials (valeurs masquées) |
-| `13-jenkins-config-sonarqube.png` | Manage Jenkins → System → SonarQube servers |
-| `14-sonarqube-webhook.png` | SonarQube → Administration → Webhooks |
-| `15-dockerhub-tags.png` | hub.docker.com → `jogoat123/souverainrecrut-backend` → Tags |
-| `20-vmware-snapshot.png` | VMware → VM → Snapshot → Snapshot Manager |
-| `22-gitlab-variables.png` | GitLab → Settings → CI/CD → Variables (valeurs masquées) |
-| `27-gitlab-pipeline-complet.png` | pipeline avec les 3 jobs verts |
 | `28-api-health-navigateur.png` | `http://192.168.13.129:4000/v1/health` dans le navigateur |
 | `29-api-info-1.1.0.png` | `http://192.168.13.129:4000/v1/info` après déploiement de la 1.1.0 |
 | `30-gitlab-rollback.png` | job `rollback-production` réussi |
