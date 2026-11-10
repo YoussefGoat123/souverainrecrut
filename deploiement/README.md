@@ -10,6 +10,8 @@ deploiement/
 ├── deployment/
 │   ├── docker-compose.yml   API + PostgreSQL + migrations Prisma
 │   └── .env.example         modèle de configuration (le .env réel n'est jamais versionné)
+├── scripts/
+│   └── verifier-api.sh   vérification fonctionnelle de l'API déployée (endpoints, accès, persistance)
 ├── .gitlab-ci.yml        pipeline de déploiement (validation, approbation manuelle, vérification, rollback)
 └── README.md             ce document
 ```
