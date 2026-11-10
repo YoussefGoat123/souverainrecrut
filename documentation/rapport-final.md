@@ -3,9 +3,9 @@
 **Mastère Expert en Développement et Déploiement de Solutions Numériques Sécurisées – RNCP 40166**
 Module CI/CD – Sup de Vinci Rennes – Formateur : Alimou Diallo
 
-> **Version de travail.** Partie 1 (intégration continue) terminée. Partie 2 : serveur, Terraform,
-> Ansible et Docker Compose réalisés et testés ; exécution du pipeline GitLab et test de rollback
-> marqués *[à compléter]*.
+> Chaîne complète réalisée et vérifiée : intégration continue (Jenkins, SonarQube, Trivy, Docker Hub),
+> provisionnement (VMware, Terraform, Ansible), déploiement (GitLab CI/CD, Docker Compose, PostgreSQL)
+> et rollback testé sur un scénario maîtrisé (10/11/2026).
 
 ---
 
@@ -327,7 +327,47 @@ rétrocompatibles (le rollback de l'image ne défait pas le schéma).
 
 La pile redémarre aussi automatiquement après un redémarrage de la VM (`restart: unless-stopped`).
 
-*[à compléter : résultats du scénario de rollback version A → version B → retour à A]*
+![API en ligne : GET /v1/health](captures/28-api-health-navigateur.png)
+
+**Scénario de rollback maîtrisé (10/11/2026)**
+
+Préparation : publication d'une version **B** par la chaîne CI (build Jenkins #8,
+`1.1.0-4371f31` : numéro de version passé à 1.1.0, 65/65 tests, Trivy 0 CRITICAL), la version **A**
+`1.0.0-fc7bb2c` étant en production avec des données (1 utilisateur, 1 candidat, 1 offre, 1 candidature).
+
+| # | Action | Résultat constaté |
+|---|---|---|
+| 1 | État initial | `/v1/info` → `"version":"1.0.0"` |
+| 2 | Pipeline #3050242384 avec `BACKEND_TAG=1.1.0-4371f31`, approbation de `deploy-production` | sauvegarde `avant-1.1.0-4371f31-…sql.gz`, migrations OK, API *healthy*, `/v1/info` → **1.1.0**, données identiques |
+| 3 | ▶ `rollback-production`, **sans paramètre** | le job lit `deploy-history.log` et retrouve seul `1.0.0-fc7bb2c` ; sauvegarde `avant-1.0.0-fc7bb2c-…sql.gz` |
+| 4 | Contrôles | `/v1/info` → **1.0.0**, `api` et `db` *healthy*, `/v1/ready` → `CONNECTED`, statistiques identiques (1/1/1/1) |
+
+Historique du serveur après le scénario :
+```
+2026-11-10T14:04:44Z 1.0.0-fc7bb2c pipeline=3049956923 par=elbazyoussef8   premier déploiement
+2026-11-10T14:08:22Z 1.0.0-fc7bb2c pipeline=3049956923 par=elbazyoussef8   (rollback testé sans version antérieure : même version)
+2026-11-10T15:03:05Z 1.1.0-4371f31 pipeline=3050242384 par=elbazyoussef8   version B
+2026-11-10T15:07:33Z 1.0.0-fc7bb2c pipeline=3050242384 par=elbazyoussef8   rollback vers A
+```
+La version 1.1.0 n'ajoutant aucune migration, le retour à la 1.0.0 est sans risque pour le schéma ; dans le
+cas contraire, la sauvegarde prise avant le déploiement permet la restauration décrite dans
+[`procedure-rollback.md`](procedure-rollback.md).
+
+Version A en ligne avant le scénario :
+
+![/v1/info avant : version 1.0.0](captures/29a-api-info-avant-1.0.0.png)
+
+Après déploiement de la version B :
+
+![/v1/info après déploiement : version 1.1.0](captures/29-api-info-1.1.0.png)
+
+Pipeline de la version B (validation et déploiement approuvé) :
+
+![Pipeline de déploiement de la version 1.1.0](captures/30a-gitlab-pipeline-1.1.0.png)
+
+Après le rollback :
+
+![/v1/info après rollback : version 1.0.0](captures/31-api-info-apres-rollback.png)
 
 ## 8. Conformité aux exigences de qualité et de sécurité (§7)
 
@@ -337,8 +377,8 @@ La pile redémarre aussi automatiquement après un redémarrage de la VM (`resta
 | Qualité logicielle | ✅ | Tests exécutés à chaque build, couverture et SonarQube consultables |
 | Sécurité | ✅ | Secrets en credentials Jenkins / variables GitLab masquées, image scannée par Trivy, pare-feu, base non exposée, clé SSH dédiée |
 | Traçabilité | ✅ | Tag `<version>-<commit>`, labels OCI, logs de build archivés, `deploy-history.log` |
-| Déploiement | ✅ testé / ⏳ via GitLab | Serveur récupère l'image et l'API démarre avec PostgreSQL (test Compose) ; exécution GitLab à compléter |
-| Continuité (rollback) | ✅ documenté / ⏳ testé | `procedure-rollback.md`, job `rollback-production`, sauvegarde avant déploiement |
+| Déploiement | ✅ | Pipeline GitLab : image Docker Hub récupérée sans reconstruction, API *healthy* avec PostgreSQL, endpoints et persistance vérifiés |
+| Continuité (rollback) | ✅ | `procedure-rollback.md` ; scénario A → B → A réussi via `rollback-production` ; sauvegarde avant chaque déploiement |
 | Documentation | ✅ | README CI et déploiement, architecture, procédures, runbooks, ce rapport |
 
 ## 9. Limites et pistes d'amélioration

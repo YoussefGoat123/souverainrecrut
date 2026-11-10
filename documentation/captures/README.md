@@ -33,6 +33,11 @@ Avant d'ajouter une capture : vérifier qu'aucun token, mot de passe ou clé n'e
 | `26-gitlab-pipeline-deploiement-reussi.png` | GitLab | `validate-tag` et `deploy-production` (approuvé) réussis, `verify-deployment` en cours |
 | `22-gitlab-variables.png` | GitLab | Variables CI/CD : valeurs masquées, Protected / Masked / File |
 | `27-gitlab-pipeline-complet.png` | GitLab | Pipeline #3049956923 terminé : validate, deploy, verify en succès |
+| `28-api-health-navigateur.png` | API | `GET /v1/health` : status UP (production) |
+| `29a-api-info-avant-1.0.0.png` | Rollback | `/v1/info` avant le scénario : version 1.0.0 |
+| `29-api-info-1.1.0.png` | Rollback | `/v1/info` après déploiement de la version B : 1.1.0 |
+| `30a-gitlab-pipeline-1.1.0.png` | Rollback | Pipeline #3050242384 : déploiement de 1.1.0-4371f31 |
+| `31-api-info-apres-rollback.png` | Rollback | `/v1/info` après rollback : retour à 1.0.0 |
 
 Snapshot VMware : preuve textuelle (`vmrun listSnapshots`) dans le rapport, section 7.1.
 
@@ -40,7 +45,5 @@ Snapshot VMware : preuve textuelle (`vmrun listSnapshots`) dans le rapport, sect
 
 | Nom suggéré | Où la prendre |
 |---|---|
-| `28-api-health-navigateur.png` | `http://192.168.13.129:4000/v1/health` dans le navigateur |
-| `29-api-info-1.1.0.png` | `http://192.168.13.129:4000/v1/info` après déploiement de la 1.1.0 |
-| `30-gitlab-rollback.png` | job `rollback-production` réussi |
-| `31-api-info-apres-rollback.png` | `/v1/info` affichant 1.0.0 après le rollback |
+| `30-gitlab-rollback.png` | pipeline #3050242384 avec `rollback-production` réussi |
+| `32-gitlab-environnement-historique.png` | GitLab → Operate → Environments → production (historique des déploiements) |
