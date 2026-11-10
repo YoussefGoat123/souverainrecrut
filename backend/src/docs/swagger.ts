@@ -15,7 +15,7 @@ const options: swaggerJsdoc.Options = {
 
     info: {
       title: "SouverainRecrut API",
-      version: "1.0.0",
+      version: "1.1.0",
       description:
         "API REST de la plateforme SouverainRecrut développée avec Express, TypeScript, Prisma et PostgreSQL.",
 

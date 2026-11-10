@@ -20,7 +20,7 @@ export const infoDocs = {
 
                   data: {
                     name: "SouverainRecrut API",
-                    version: "1.0.0",
+                    version: "1.1.0",
                     environment: "development",
                     apiVersion: "v1",
                     documentation: "/api-docs",

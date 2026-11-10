@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Bienvenue sur l'API SouverainRecrut 🚀",
-    version: "1.0.0",
+    version: "1.1.0",
     api: `/${env.apiVersion}`,
     documentation: "/api-docs",
   });
