@@ -1,0 +1,82 @@
+# ==========================================================
+# Déploiement SouverainRecrut – API Backend + PostgreSQL
+# ==========================================================
+# L'image de l'API n'est JAMAIS reconstruite ici : elle est tirée de Docker Hub,
+# telle que publiée (et contrôlée) par la pipeline Jenkins.
+#
+# Usage (dans le répertoire de déploiement, avec un fichier .env) :
+#   docker compose pull
+#   docker compose up -d
+#   docker compose ps
+#   docker compose logs -f api
+name: souverainrecrut
+
+services:
+
+  # ---------- Base de données ----------
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER manquant dans .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant dans .env}
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB manquant dans .env}
+    volumes:
+      # Données persistantes : survivent aux redémarrages et aux mises à jour de l'API
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    # Pas de "ports" : PostgreSQL n'est joignable que par les conteneurs du réseau backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ---------- Migrations Prisma (exécution unique avant l'API) ----------
+  migrate:
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE manquant}:${BACKEND_TAG:?BACKEND_TAG manquant}
+    command: ["node", "node_modules/prisma/build/index.js", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: "no"
+
+  # ---------- API Backend ----------
+  api:
+    image: ${BACKEND_IMAGE}:${BACKEND_TAG}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        # L'API ne démarre que si les migrations ont réussi
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      API_VERSION: ${API_VERSION:-v1}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET manquant dans .env}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4000/$${API_VERSION:-v1}/health > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  backend:
+
+volumes:
+  pgdata:
