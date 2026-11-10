@@ -3,8 +3,9 @@
 **Mastère Expert en Développement et Déploiement de Solutions Numériques Sécurisées – RNCP 40166**
 Module CI/CD – Sup de Vinci Rennes – Formateur : Alimou Diallo
 
-> **Version de travail.** Partie 1 (intégration continue) rédigée. Partie 2 (provisionnement,
-> déploiement, rollback) à compléter : sections marquées *[à venir]*.
+> **Version de travail.** Partie 1 (intégration continue) terminée. Partie 2 : serveur, Terraform,
+> Ansible et Docker Compose réalisés et testés ; exécution du pipeline GitLab et test de rollback
+> marqués *[à compléter]*.
 
 ---
 
@@ -20,7 +21,7 @@ documentée**, depuis un commit jusqu'à une API déployée :
 1. **Intégration continue** – le code est testé et analysé, une image Docker est construite, scannée
    et publiée sur Docker Hub (Jenkins, SonarQube, Trivy).
 2. **Déploiement** – l'image publiée est récupérée par un pipeline GitLab CI/CD et déployée sur un
-   serveur Ubuntu préparé avec Ansible (et Terraform selon l'environnement). *[à venir]*
+   serveur Ubuntu préparé avec Ansible et Terraform.
 
 ## 2. Démarche
 
@@ -76,7 +77,7 @@ absence de `.dockerignore`.
   couverture 94,4 %.
 
 ### 3.4 Jenkins
-- Jenkins en conteneur, à partir d'une **image personnalisée** (`jenkins/Dockerfile`) contenant
+- Jenkins en conteneur, à partir d'une **image personnalisée** (`integration-continue/jenkins/Dockerfile`) contenant
   Node 22, Docker CLI, Trivy et les plugins (`plugins.txt`) : l'environnement de build est décrit
   en code et reconstructible.
 - Accès au moteur Docker de l'hôte via le socket, avec ajout du seul groupe propriétaire
@@ -147,33 +148,79 @@ applicative (`1.0.0`) et le commit (`2d7e00c`).
 | 6 | Token SonarQube exposé | Collé dans un échange en clair | Révocation et remplacement |
 | 7 | Échec ponctuel de `npm ci` au build Docker | Erreur réseau passagère | Build relancé à l'identique : succès |
 | 8 | Build #1 : `Failed to query server version` | SonarQube **tué par manque de mémoire** (`OOMKilled`) pendant les tests : Jest lançait 15 processus (16 cœurs) sur ≈ 2,8 Go | Jest à 2 workers, Jenkins `-Xmx768m`, SonarQube en redémarrage automatique. Tests : 6 min 30 → 9 s |
+| 9 | ESXi : *« Virtualized AMD-V/RVI is not supported »* | Virtualisation activée dans le BIOS, mais Hyper-V actif (Docker Desktop, VBS) : pas de virtualisation imbriquée ; ESXi exige 8 Go de RAM | VM Ubuntu créée directement dans VMware Workstation (cas prévu au §4.2) |
+| 10 | Docker Desktop ne démarre plus (`HCS/ERROR_NO_SYSTEM_RESOURCES`) | 0,9 Go de RAM libre | CI et déploiement utilisés en alternance ; VM à 2 Go |
+| 11 | WSL indisponible pour Ansible | même cause mémoire | VM utilisée comme poste de contrôle, Ansible reste en SSH |
+| 12 | Disque de la VM à 14 Go au lieu de 30 | partitionnement LVM par défaut d'Ubuntu (moitié du disque) | `lvextend -r -l +100%FREE` → 28 Go |
+| 13 | Migrations impossibles dans l'image : `Can't write to node_modules/@prisma/engines` | moteur Prisma non téléchargé (`--ignore-scripts`), `node_modules` non modifiable par l'utilisateur non-root | Dockerfile : copie de `@prisma/engines` depuis l'étape builder ; validé sur le serveur (5 tables créées) |
+| 14 | `.gitlab-ci.yml` refusé par l'éditeur (*Expected string*) | `Tag invalide : …` : « deux-points espace » interprété comme une clé YAML | message reformulé ; contrôle automatique que chaque ligne de script est une chaîne |
 
 L'incident 8 illustre le rôle de la pipeline : l'échec a stoppé la chaîne **avant** la publication ;
-aucune image non contrôlée n'a atteint Docker Hub.
+aucune image non contrôlée n'a atteint Docker Hub. L'incident 13 illustre l'intérêt de tester en
+conditions réelles (« Manuel » avant « Automatisé ») : il a été détecté avant le premier déploiement.
 
-## 7. Partie 2 – Provisionnement et déploiement *[à venir]*
+## 7. Partie 2 – Provisionnement et déploiement
 
-- 4.1 Machine virtuelle Ubuntu Server 24.04 (VMware), SSH, snapshot
-- 4.2 Terraform
-- 4.3 Ansible (Docker Engine, Docker Compose, répertoire de déploiement)
-- 4.4 / 5.3 Pipeline GitLab CI/CD (validation du tag, SSH, pull de l'image, approbation manuelle)
-- 5.2 Docker Compose : API + PostgreSQL, volume, healthchecks, migrations Prisma
-- 5.4 Vérification et procédure de rollback
+### 7.1 Environnement VMware (§4.1)
+- VM `souverainrecrut-srv` dans **VMware Workstation 17.6.4** : Ubuntu Server **24.04.5 LTS**, 2 vCPU,
+  2 Go RAM, 30 Go, réseau NAT, IP `192.168.13.129`.
+- L'ISO fourni (Ubuntu 22.04 *Desktop*) n'étant pas conforme, l'ISO officiel Server 24.04.3 a été utilisé.
+- SSH vérifié depuis Windows, accès Internet vérifié, système mis à jour, disque étendu à 28 Go.
+- Clé SSH **dédiée** au déploiement (ed25519), créée sur le poste, droits restreints, authentification
+  sans mot de passe vérifiée.
+- Snapshot `01-ubuntu-installe-a-jour` pris **avant** toute configuration.
+- ESXi abandonné (incident 9) : justification technique dans [`architecture.md`](architecture.md).
 
-Point d'attention identifié : le poste dispose de 5,9 Go de RAM ; la VM sera dimensionnée en
-conséquence et SonarQube/Jenkins arrêtés pendant le déploiement.
+### 7.2 Terraform (§4.2)
+Faute d'ESXi/vCenter, Terraform est appliqué aux ressources disponibles : `providers.tf`,
+`variables.tf`, `main.tf`, `outputs.tf`. Il décrit le serveur (IP validée, utilisateur, répertoire,
+caractéristiques de la VM) et **génère l'inventaire Ansible** : l'adresse du serveur n'est saisie qu'une
+fois. `init` → `validate` → `plan` (2 ressources) → `apply`. Lockfile du provider versionné.
+
+### 7.3 Ansible (§4.3)
+Playbook idempotent : mise à jour du système, **Docker Engine et plugin Compose** depuis le dépôt
+officiel, service activé, utilisateur `deploy` dans le groupe `docker`, répertoire
+`/opt/souverainrecrut`, pare-feu UFW (22 et 4000, SSH autorisé avant activation), vérifications.
+Résultat : `ok=18 changed=7 failed=0` ; Docker 29.9.3 actif, Compose 5.7.0.
+
+### 7.4 Docker Compose (§5.2)
+Services `db` (PostgreSQL 16, volume persistant, non exposé), `migrate` (`prisma migrate deploy`,
+exécution unique) et `api` (image Docker Hub, démarre seulement si les migrations ont réussi),
+healthchecks et redémarrage automatique. Variables obligatoires contrôlées ; `.env.example` versionné,
+`.env` réel jamais versionné.
+
+Test réalisé sur le serveur : `db` et `api` *healthy*, `migrate` *Exited (0)*, `/v1/health` → `UP`,
+`/v1/ready` → `CONNECTED` ; API joignable depuis le poste, PostgreSQL non joignable.
+
+### 7.5 Pipeline GitLab CI/CD (§4.4, §5.1, §5.3)
+Projet GitLab dédié au déploiement. Jobs : `validate-tag` (format `version-commit` et existence sur
+Docker Hub), `deploy-production` (**approbation manuelle** ; SSH ; Compose ; `.env` généré depuis des
+variables masquées ; sauvegarde `pg_dump` ; `docker login --password-stdin` ; `pull` ; `up -d` ;
+historique), `verify-deployment` (état *healthy*, `/v1/health`, `/v1/ready`, tag effectivement en
+service), `rollback-production` (manuel). Runner local sur le serveur, celui-ci étant sur un réseau
+privé. L'image n'est jamais reconstruite.
+
+*[à compléter : exécution réelle du pipeline, captures]*
+
+### 7.6 Vérification et rollback (§5.4)
+Procédure : [`procedure-rollback.md`](procedure-rollback.md). Version précédente identifiée par
+l'historique `deploy-history.log` et les tags Docker Hub ; retour arrière par le job
+`rollback-production` ou manuellement ; sauvegarde de la base avant chaque déploiement, migrations
+rétrocompatibles (le rollback de l'image ne défait pas le schéma).
+
+*[à compléter : résultats du scénario de test version A → version B → rollback vers A]*
 
 ## 8. Conformité aux exigences de qualité et de sécurité (§7)
 
 | Exigence | Statut | Éléments |
 |---|---|---|
-| Reproductibilité | ✅ partie 1 | Procédures dans `integration-continue/README.md`, image Jenkins et pipeline en code |
+| Reproductibilité | ✅ | `integration-continue/README.md`, `procedure-deploiement.md` ; Jenkins, Terraform, Ansible, Compose et pipelines en code |
 | Qualité logicielle | ✅ | Tests exécutés à chaque build, couverture et SonarQube consultables |
-| Sécurité | ✅ | Secrets protégés, image scannée par Trivy avec seuil bloquant |
-| Traçabilité | ✅ | Tag `<version>-<commit>`, labels OCI, logs de build archivés |
-| Déploiement | ⏳ | Partie 2 |
-| Continuité (rollback) | ⏳ | Partie 2 – les tags versionnés permettent déjà de cibler une version antérieure |
-| Documentation | ✅ partie 1 | README du pipeline, architecture, runbook, ce rapport |
+| Sécurité | ✅ | Secrets en credentials Jenkins / variables GitLab masquées, image scannée par Trivy, pare-feu, base non exposée, clé SSH dédiée |
+| Traçabilité | ✅ | Tag `<version>-<commit>`, labels OCI, logs de build archivés, `deploy-history.log` |
+| Déploiement | ✅ testé / ⏳ via GitLab | Serveur récupère l'image et l'API démarre avec PostgreSQL (test Compose) ; exécution GitLab à compléter |
+| Continuité (rollback) | ✅ documenté / ⏳ testé | `procedure-rollback.md`, job `rollback-production`, sauvegarde avant déploiement |
+| Documentation | ✅ | README CI et déploiement, architecture, procédures, runbooks, ce rapport |
 
 ## 9. Limites et pistes d'amélioration
 - Monter de version Prisma pour supprimer les 2 vulnérabilités HIGH restantes.
@@ -192,22 +239,35 @@ conséquence et SonarQube/Jenkins arrêtés pendant le déploiement.
 | `9b39b01` | Image Jenkins (Dockerfile, plugins, docker-compose) |
 | `03eeb89` | Jenkinsfile, Dockerfile Backend sécurisé, rapport JUnit |
 | `2d7e00c` | Limites mémoire (Jest, Jenkins) – build #2 vert, image publiée |
+| `ad9b7e5` | Livrables partie CI (documentation, rapports) |
+| `b79d890` … `95dc8f4` | Partie déploiement : `.gitignore`, correctif migrations Prisma, captures VM, Terraform, Ansible, Docker Compose, GitLab CI |
 
 ## Annexe B – Organisation du livrable
 
+Conforme à l'organisation du §6 du cahier des charges :
+
 ```
-Jenkinsfile                      pipeline CI (lu par Jenkins à la racine)
-backend/                         API, tests, Dockerfile, .dockerignore, sonar-project.properties
-jenkins/                         image et lancement de Jenkins
 integration-continue/
-  README.md                      documentation du pipeline + runbook
-  sonar/README.md                Quality Gate, résultats, hotspot
-  reports/                       tests, couverture, Trivy, logs Jenkins
-deploiement/                     [à venir] terraform, ansible, deployment/, .gitlab-ci.yml
+├── Jenkinsfile                  pipeline CI (Script Path du job Jenkins)
+├── Dockerfile                   image de l'API (contexte de build : backend/)
+├── sonar/                       sonar-project.properties, Quality Gate, résultats
+├── reports/                     tests, couverture, Trivy, logs Jenkins
+├── jenkins/                     image et lancement de Jenkins
+└── README.md                    documentation du pipeline + runbook
+deploiement/
+├── terraform/                   providers.tf, variables.tf, main.tf, outputs.tf
+├── ansible/                     inventory.ini, playbook.yml, ansible.cfg
+├── deployment/
+│   ├── docker-compose.yml
+│   └── .env.example
+├── .gitlab-ci.yml
+└── README.md
 documentation/
-  architecture.md
-  rapport-final.md               ce document
-  procedure-deploiement.md       [à venir]
-  procedure-rollback.md          [à venir]
-  captures/                      captures d'écran
+├── architecture.md
+├── procedure-deploiement.md
+├── procedure-rollback.md
+├── rapport-final.md             ce document
+└── captures/                    captures d'écran
+backend/                         code de l'API, tests, .dockerignore
 ```
+Exclus du dépôt : `.env` réels, `terraform.tfvars`, états Terraform, clés privées, tokens, ISO.
