@@ -2,7 +2,9 @@
 
 ## 1. Paramètres d'analyse
 
-Fichier : [`/backend/sonar-project.properties`](../../backend/sonar-project.properties)
+Fichier : [`sonar-project.properties`](sonar-project.properties) (ce dossier), utilisé avec
+`-Dproject.settings=../integration-continue/sonar/sonar-project.properties` depuis `backend/`
+(base d'analyse : le code applicatif).
 
 ```properties
 sonar.projectKey=souverainrecrut-backend

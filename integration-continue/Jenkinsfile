@@ -5,7 +5,10 @@
 //             -> build image -> scan Trivy -> push Docker Hub
 // L'image n'est publiée que si TOUTES les étapes précédentes réussissent.
 //
-// Prérequis Jenkins (voir jenkins/ et process/04-jenkins.md) :
+// Emplacement : integration-continue/Jenkinsfile (job Jenkins : Script Path = integration-continue/Jenkinsfile)
+// Le code applicatif est dans backend/ ; Dockerfile et configuration Sonar sont dans integration-continue/.
+//
+// Prérequis Jenkins (voir integration-continue/jenkins/ et integration-continue/README.md) :
 //   - credentials : 'sonar-token' (Secret text), 'dockerhub' (Username + access token)
 //   - serveur SonarQube 'sonarqube' et outil 'sonar-scanner'
 //   - webhook SonarQube -> http://jenkins:8080/sonarqube-webhook/
@@ -85,7 +88,13 @@ pipeline {
       steps {
         dir('backend') {
           withSonarQubeEnv('sonarqube') {
-            sh "${tool 'sonar-scanner'}/bin/sonar-scanner -Dsonar.projectVersion=${APP_VERSION}"
+            // Configuration versionnée dans integration-continue/sonar/ ; base d'analyse = backend/
+            sh """
+              ${tool 'sonar-scanner'}/bin/sonar-scanner \
+                -Dproject.settings=../integration-continue/sonar/sonar-project.properties \
+                -Dsonar.projectBaseDir=. \
+                -Dsonar.projectVersion=${APP_VERSION}
+            """
           }
         }
       }
@@ -102,14 +111,15 @@ pipeline {
 
     stage('Build image') {
       steps {
-        dir('backend') {
-          sh """
-            docker build \
-              --build-arg VERSION=${APP_VERSION} \
-              --build-arg REVISION=${GIT_SHA} \
-              -t ${IMAGE_NAME}:${IMAGE_TAG} .
-          """
-        }
+        // Dockerfile dans integration-continue/, contexte de build = backend/ (avec son .dockerignore)
+        sh """
+          docker build \
+            -f integration-continue/Dockerfile \
+            --build-arg VERSION=${APP_VERSION} \
+            --build-arg REVISION=${GIT_SHA} \
+            -t ${IMAGE_NAME}:${IMAGE_TAG} \
+            backend
+        """
       }
     }
 

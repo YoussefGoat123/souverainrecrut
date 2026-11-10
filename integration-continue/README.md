@@ -21,22 +21,33 @@ docker build ──> Trivy (CRITICAL corrigeable => arrêt) ──> docker push
 
 ---
 
-## 1. Emplacement des fichiers
+## 1. Contenu du dossier
 
-Les fichiers restent à l'endroit où les outils les attendent (Jenkins lit `Jenkinsfile` à la racine,
-le build Docker utilise `backend/` comme contexte). Ce dossier les documente et regroupe les rapports.
+```
+integration-continue/
+├── Jenkinsfile                 pipeline déclaratif (job Jenkins : Script Path = integration-continue/Jenkinsfile)
+├── Dockerfile                  image de l'API (multi-stage, non-root, healthcheck) – contexte de build : backend/
+├── sonar/
+│   ├── sonar-project.properties   paramètres d'analyse SonarQube
+│   └── README.md                  Quality Gate, résultats, hotspot traité
+├── reports/                    tests, couverture, Trivy, logs Jenkins
+├── jenkins/                    image et lancement de Jenkins (Dockerfile, plugins.txt, docker-compose.yml)
+└── README.md                   ce document
+```
 
-| Élément du livrable | Fichier dans le dépôt | Rôle |
-|---|---|---|
-| Jenkinsfile | [`/Jenkinsfile`](../Jenkinsfile) | Pipeline déclaratif versionné |
-| Dockerfile | [`/backend/Dockerfile`](../backend/Dockerfile) | Image de l'API (multi-stage, non-root, healthcheck) |
-| | [`/backend/.dockerignore`](../backend/.dockerignore) | Exclut secrets, tests, rapports du contexte de build |
-| Configuration Sonar | [`/backend/sonar-project.properties`](../backend/sonar-project.properties) | Paramètres d'analyse |
-| sonar/ | [`sonar/`](sonar/) | Quality Gate, résultats, traitement du hotspot |
-| reports/ | [`reports/`](reports/) | Rapports de tests, couverture, Trivy, logs Jenkins |
-| Image Jenkins | [`/jenkins/`](../jenkins/) | `Dockerfile`, `plugins.txt`, `docker-compose.yml` |
-| Tests | [`/backend/tests/`](../backend/tests/) | 9 fichiers, 65 tests (Jest + Supertest) |
-| Config Jest | [`/backend/jest.config.js`](../backend/jest.config.js) | Couverture lcov + rapport JUnit |
+Fichiers liés, restés dans le code applicatif :
+
+| Fichier | Rôle |
+|---|---|
+| [`/backend/.dockerignore`](../backend/.dockerignore) | Exclut secrets (`.env`), tests et rapports du contexte de build `backend/` |
+| [`/backend/tests/`](../backend/tests/) | 9 fichiers, 65 tests (Jest + Supertest) |
+| [`/backend/jest.config.js`](../backend/jest.config.js) | Couverture lcov + rapport JUnit |
+
+Commandes équivalentes à la pipeline, depuis la racine du dépôt :
+```bash
+docker build -f integration-continue/Dockerfile -t souverainrecrut-backend:local backend
+cd backend && sonar-scanner -Dproject.settings=../integration-continue/sonar/sonar-project.properties
+```
 
 ---
 
@@ -74,7 +85,7 @@ Puis dans http://localhost:9000 :
 
 ### 3.2 Jenkins
 ```bash
-cd jenkins
+cd integration-continue/jenkins
 docker compose up -d --build
 docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 ```
@@ -95,7 +106,8 @@ Trivy et les plugins `git`, `workflow-aggregator`, `pipeline-stage-view`, `crede
 
 ### 3.4 Job
 New Item → **Pipeline** `souverainrecrut-backend` → *Pipeline script from SCM* :
-Git `https://github.com/YoussefGoat123/souverainrecrut.git`, branche `*/Dev`, script `Jenkinsfile`.
+Git `https://github.com/YoussefGoat123/souverainrecrut.git`, branche `*/Dev`,
+Script Path **`integration-continue/Jenkinsfile`**.
 
 ---
 
