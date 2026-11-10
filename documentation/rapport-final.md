@@ -200,7 +200,24 @@ historique), `verify-deployment` (état *healthy*, `/v1/health`, `/v1/ready`, ta
 service), `rollback-production` (manuel). Runner local sur le serveur, celui-ci étant sur un réseau
 privé. L'image n'est jamais reconstruite.
 
-*[à compléter : exécution réelle du pipeline, captures]*
+**Mise en œuvre** :
+- projet GitLab `souverainrecrut-deploiement` alimenté par `git subtree push --prefix deploiement`
+  (le dossier `deploiement/` du dépôt principal devient la racine du projet GitLab) ;
+- runner GitLab 19.5.3 installé sur le serveur (exécuteur Docker, tag `souverainrecrut`), jeton saisi
+  sans affichage (`read -rs`), configuration lisible par root uniquement ;
+- 9 variables CI/CD (clé SSH et `known_hosts` en type *File*, token Docker Hub en lecture seule,
+  mot de passe PostgreSQL et secret JWT générés par `openssl rand` et masqués).
+
+**Premier déploiement – pipeline #3049956923 (10/11/2026)** :
+| Job | Résultat |
+|---|---|
+| `validate-tag` | ✅ `1.0.0-fc7bb2c` au bon format et présent sur Docker Hub |
+| `deploy-production` | ✅ après approbation manuelle |
+| `verify-deployment` | ✅ API *healthy*, `/v1/ready` = `CONNECTED`, bon tag en service |
+
+État constaté sur le serveur : `api` (`1.0.0-fc7bb2c`) et `db` *healthy*, `migrate` *Exited (0)*,
+`.env` en 600, `backups/` en 700, historique :
+`2026-11-10T14:04:44Z 1.0.0-fc7bb2c pipeline=3049956923 par=elbazyoussef8`.
 
 ### 7.6 Vérification et rollback (§5.4)
 Procédure : [`procedure-rollback.md`](procedure-rollback.md). Version précédente identifiée par
@@ -208,7 +225,21 @@ l'historique `deploy-history.log` et les tags Docker Hub ; retour arrière par l
 `rollback-production` ou manuellement ; sauvegarde de la base avant chaque déploiement, migrations
 rétrocompatibles (le rollback de l'image ne défait pas le schéma).
 
-*[à compléter : résultats du scénario de test version A → version B → rollback vers A]*
+**Vérification fonctionnelle de l'API déployée** (script `deploiement/scripts/verifier-api.sh`) :
+
+| Contrôle | Résultat |
+|---|---|
+| `GET /health`, `/ready`, `/info` | `UP`, `CONNECTED`, `SouverainRecrut API v1.0.0 (production)` |
+| Connexion administrateur | JWT reçu, mot de passe absent de la réponse ; mauvais mot de passe → 401 |
+| Contrôle d'accès | sans token → 401, token falsifié → 401 |
+| Candidats | création (email normalisé), doublon → 409, données invalides → 400, inconnu → 404 |
+| Offres, candidatures | création, passage de la candidature au statut `ACCEPTED` |
+| Tableau de bord | `users 1, candidates 1, jobs 1, applications 1` |
+| **Persistance** | `docker compose down` puis `up` (volume conservé) : 1 candidat avant, 1 après |
+
+La pile redémarre aussi automatiquement après un redémarrage de la VM (`restart: unless-stopped`).
+
+*[à compléter : résultats du scénario de rollback version A → version B → retour à A]*
 
 ## 8. Conformité aux exigences de qualité et de sécurité (§7)
 

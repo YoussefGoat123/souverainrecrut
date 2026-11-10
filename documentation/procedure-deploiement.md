@@ -145,6 +145,14 @@ Ce que fait `deploy-production` sur le serveur :
 | Journaux | `docker compose logs -f api` | pas d'erreur |
 | Historique | `cat /opt/souverainrecrut/deploy-history.log` | une ligne par déploiement |
 
+Vérification fonctionnelle complète (sur le serveur, après copie de `deploiement/scripts/verifier-api.sh`) :
+```bash
+bash verifier-api.sh < /dev/null
+```
+Le script crée un administrateur de test, teste santé, authentification, contrôle d'accès (401),
+création de candidat / offre / candidature, erreurs 400 / 404 / 409, statistiques, puis redémarre la
+pile (`down` / `up` sans `-v`) et vérifie que les données sont conservées.
+
 ## Déploiement manuel de secours (sans GitLab)
 ```bash
 ssh -i ~/.ssh/souverainrecrut_deploy deploy@192.168.13.129
