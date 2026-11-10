@@ -76,6 +76,30 @@ absence de `.dockerignore`.
 - **Résultat** : Quality Gate **Passed** – 0 bug, 0 vulnérabilité, 0 hotspot, 0 % de duplication,
   couverture 94,4 %.
 
+**Première analyse** : Quality Gate « Sonar way » passé, mais un Security Hotspot non examiné (note E).
+
+![Première analyse SonarQube : hotspot non examiné](captures/01-sonarqube-1re-analyse-hotspot-E.png)
+
+![Couverture 94,4 % et duplications 0 %](captures/02-sonarqube-1re-analyse-couverture-duplications.png)
+
+**Hotspot S5689** sur `const app = express()` : en-tête `X-Powered-By` révélant la technologie.
+
+![Détail du Security Hotspot S5689](captures/03-sonarqube-security-hotspot-x-powered-by.png)
+
+**Après correction** (`app.disable("x-powered-by")`) : plus aucun hotspot, Security Review A.
+
+![Analyse après correction du hotspot](captures/04-sonarqube-apres-correction-hotspot.png)
+
+**Quality Gate « SouverainRecrut »** : conditions sur le code neuf, puis sur l'ensemble du code.
+
+![Conditions du Quality Gate sur le code neuf](captures/05-quality-gate-conditions-new-code.png)
+
+![Conditions du Quality Gate sur l'ensemble du code](captures/06-quality-gate-conditions-overall-code.png)
+
+**Analyse finale** avec le gate personnalisé : Passed (le message confirme l'ajout de conditions).
+
+![Analyse finale : Quality Gate Passed](captures/07-sonarqube-analyse-finale-passed.png)
+
 ### 3.4 Jenkins
 - Jenkins en conteneur, à partir d'une **image personnalisée** (`integration-continue/jenkins/Dockerfile`) contenant
   Node 22, Docker CLI, Trivy et les plugins (`plugins.txt`) : l'environnement de build est décrit
@@ -90,6 +114,13 @@ absence de `.dockerignore`.
 Checkout de `Dev` → `npm ci` → `prisma generate` → tests (JUnit + couverture) → analyse SonarQube →
 **Quality Gate bloquant** → build de l'image → **Trivy bloquant** → push Docker Hub.
 Déclenchement automatique toutes les 5 minutes en cas de nouveau commit (`pollSCM`).
+
+![Premier build Jenkins en cours (Stage View)](captures/08-jenkins-build-1-en-cours.png)
+
+Build #1 arrêté à l'étape SonarQube (incident 8) : les étapes suivantes sont sautées et **aucune image
+n'est publiée**. Build #2, après correction : toutes les étapes en succès, image publiée.
+
+![Build #1 en échec, build #2 vert de bout en bout](captures/09-jenkins-build-1-echec-build-2-succes.png)
 
 ### 3.6 Image Docker et publication
 Dockerfile du Backend revu :
@@ -112,7 +143,8 @@ imposées par Prisma ; risque accepté et documenté, correction = montée de ve
 **Seuils** : CRITICAL corrigeable → bloquant ; HIGH → signalé dans le rapport archivé.
 
 **Publication** : `jogoat123/souverainrecrut-backend:1.0.0-2d7e00c` – le tag associe la version
-applicative (`1.0.0`) et le commit (`2d7e00c`).
+applicative (`1.0.0`) et le commit (`2d7e00c`). Après le correctif des migrations Prisma (incident 13),
+le build #6 a publié **`1.0.0-fc7bb2c`**, version déployée en production.
 
 ## 4. Résultats de la partie 1
 
@@ -154,6 +186,10 @@ applicative (`1.0.0`) et le commit (`2d7e00c`).
 | 12 | Disque de la VM à 14 Go au lieu de 30 | partitionnement LVM par défaut d'Ubuntu (moitié du disque) | `lvextend -r -l +100%FREE` → 28 Go |
 | 13 | Migrations impossibles dans l'image : `Can't write to node_modules/@prisma/engines` | moteur Prisma non téléchargé (`--ignore-scripts`), `node_modules` non modifiable par l'utilisateur non-root | Dockerfile : copie de `@prisma/engines` depuis l'étape builder ; validé sur le serveur (5 tables créées) |
 | 14 | `.gitlab-ci.yml` refusé par l'éditeur (*Expected string*) | `Tag invalide : …` : « deux-points espace » interprété comme une clé YAML | message reformulé ; contrôle automatique que chaque ligne de script est une chaîne |
+| 15 | Docker Desktop ne redémarre pas après utilisation de la VM (*terminated unexpectedly*) | machine virtuelle WSL (`vmmem`) restée bloquée ; WSL refusait de démarrer même plafonné à 1,5 Go alors que 12 Go de mémoire virtuelle étaient libres | `wsl --shutdown` puis `docker desktop start` (1re fois : redémarrage de Windows) ; `.wslconfig` : `memory=2560MB`, `swap=4GB` ; ajouté au runbook |
+| 16 | Builds Jenkins #4 et #5 : `Unable to find Jenkinsfile` | Jenkinsfile déplacé dans `integration-continue/` avant la mise à jour du job | Script Path du job modifié ; aucun impact (rien publié) |
+| 17 | `git push` vers GitLab : *HTTP Basic: Access denied* | GitLab n'accepte pas le mot de passe du compte pour Git en HTTPS | Personal Access Token `write_repository` |
+| 18 | Script de vérification interrompu après la 1re commande | `docker compose exec` lisait la suite du script envoyée sur l'entrée standard | exécution depuis un fichier, `< /dev/null` |
 
 L'incident 8 illustre le rôle de la pipeline : l'échec a stoppé la chaîne **avant** la publication ;
 aucune image non contrôlée n'a atteint Docker Hub. L'incident 13 illustre l'intérêt de tester en
@@ -171,6 +207,14 @@ conditions réelles (« Manuel » avant « Automatisé ») : il a été détect�
 - Snapshot `01-ubuntu-installe-a-jour` pris **avant** toute configuration.
 - ESXi abandonné (incident 9) : justification technique dans [`architecture.md`](architecture.md).
 
+![ESXi : virtualisation imbriquée AMD-V non supportée](captures/16-vmware-esxi-amd-v-non-supporte.png)
+
+![VM Ubuntu Server 24.04 installée, connexion et adresse IP](captures/17-vm-ubuntu-24.04-connexion.png)
+
+![Adresse IP et accès Internet de la VM](captures/18-vm-ubuntu-ip-et-acces-internet.png)
+
+![Connexion SSH depuis Windows et extension du disque à 28 Go](captures/19-vm-ssh-disque-etendu.png)
+
 ### 7.2 Terraform (§4.2)
 Faute d'ESXi/vCenter, Terraform est appliqué aux ressources disponibles : `providers.tf`,
 `variables.tf`, `main.tf`, `outputs.tf`. Il décrit le serveur (IP validée, utilisateur, répertoire,
@@ -182,6 +226,8 @@ Playbook idempotent : mise à jour du système, **Docker Engine et plugin Compos
 officiel, service activé, utilisateur `deploy` dans le groupe `docker`, répertoire
 `/opt/souverainrecrut`, pare-feu UFW (22 et 4000, SSH autorisé avant activation), vérifications.
 Résultat : `ok=18 changed=7 failed=0` ; Docker 29.9.3 actif, Compose 5.7.0.
+
+![Fin du playbook Ansible : PLAY RECAP et résumé](captures/21-ansible-play-recap.png)
 
 ### 7.4 Docker Compose (§5.2)
 Services `db` (PostgreSQL 16, volume persistant, non exposé), `migrate` (`prisma migrate deploy`,
@@ -218,6 +264,14 @@ privé. L'image n'est jamais reconstruite.
 État constaté sur le serveur : `api` (`1.0.0-fc7bb2c`) et `db` *healthy*, `migrate` *Exited (0)*,
 `.env` en 600, `backups/` en 700, historique :
 `2026-11-10T14:04:44Z 1.0.0-fc7bb2c pipeline=3049956923 par=elbazyoussef8`.
+
+![Runner de projet créé dans GitLab](captures/23-gitlab-runner-cree.png)
+
+![Enregistrement du runner sur le serveur (jeton saisi sans affichage)](captures/24-gitlab-runner-enregistre.png)
+
+![Pipeline de déploiement : validation en cours](captures/25-gitlab-pipeline-en-cours.png)
+
+![Validation et déploiement approuvé réussis, vérification en cours](captures/26-gitlab-pipeline-deploiement-reussi.png)
 
 ### 7.6 Vérification et rollback (§5.4)
 Procédure : [`procedure-rollback.md`](procedure-rollback.md). Version précédente identifiée par

@@ -1,5 +1,8 @@
 # Captures d'écran
 
+Toutes les captures sont intégrées dans [`../rapport-final.md`](../rapport-final.md) à l'étape correspondante.
+Avant d'ajouter une capture : vérifier qu'aucun token, mot de passe ou clé n'est visible.
+
 ## Disponibles
 
 | Fichier | Étape | Ce qu'elle montre |
@@ -16,25 +19,27 @@
 | `16-vmware-esxi-amd-v-non-supporte.png` | VMware | ESXi : virtualisation imbriquée AMD-V indisponible (justifie l'abandon d'ESXi) |
 | `17-vm-ubuntu-24.04-connexion.png` | VM | Ubuntu Server 24.04.3 installé, connexion, IP 192.168.13.129 |
 | `18-vm-ubuntu-ip-et-acces-internet.png` | VM | `ip a` et `ping ubuntu.com` : réseau et accès Internet |
+| `19-vm-ssh-disque-etendu.png` | VM | Connexion SSH depuis Windows, extension du disque (`lvextend`) : 14 → 28 Go |
 | `21-ansible-play-recap.png` | Ansible | `PLAY RECAP` ok=18 changed=7 failed=0, Docker 29.9.3, Compose 5.7.0, UFW actif |
+| `23-gitlab-runner-cree.png` | GitLab | Runner de projet `souverainrecrut-srv` créé (plateforme Linux) |
+| `24-gitlab-runner-enregistre.png` | GitLab | Enregistrement du runner sur le serveur (jeton saisi masqué), `is valid`, service actif |
+| `25-gitlab-pipeline-en-cours.png` | GitLab | Pipeline #3049956923 : validate → deploy → verify, `validate-tag` en cours |
+| `26-gitlab-pipeline-deploiement-reussi.png` | GitLab | `validate-tag` et `deploy-production` (approuvé) réussis, `verify-deployment` en cours |
 
 ## À ajouter
 
 | Nom suggéré | Où la prendre |
 |---|---|
-| `10-jenkins-test-result.png` | Jenkins → build #2 → *Test Result* (65 tests) |
-| `11-jenkins-artefacts-trivy.png` | Jenkins → build #2 → artefacts `trivy-report.txt` |
+| `10-jenkins-test-result.png` | Jenkins → dernier build → *Test Result* (65 tests) |
+| `11-jenkins-artefacts-trivy.png` | Jenkins → dernier build → artefacts `trivy-report.txt` |
 | `12-jenkins-credentials.png` | Manage Jenkins → Credentials (valeurs masquées) |
 | `13-jenkins-config-sonarqube.png` | Manage Jenkins → System → SonarQube servers |
-| `14-sonarqube-webhook.png` | SonarQube → Administration → Webhooks (dernier envoi en succès) |
-| `15-dockerhub-tag.png` | hub.docker.com → `jogoat123/souverainrecrut-backend` → Tags |
-| `19-vmware-snapshot.png` | VMware → VM → Snapshot → Snapshot Manager |
-| `20-terraform-apply.png` | sortie de `terraform apply` (outputs) |
-| `22-docker-compose-ps.png` | `docker compose ps` sur le serveur (api/db healthy) |
-| `23-gitlab-variables.png` | GitLab → Settings → CI/CD → Variables (valeurs masquées) |
-| `24-gitlab-runner-online.png` | GitLab → Settings → CI/CD → Runners |
-| `25-gitlab-pipeline-deploiement.png` | pipeline validate → deploy (manuel) → verify en vert |
-| `26-api-health-navigateur.png` | `http://192.168.13.129:4000/v1/health` dans le navigateur |
-| `27-rollback.png` | job `rollback-production` + `/v1/info` après retour arrière |
-
-Avant d'ajouter une capture : vérifier qu'aucun token, mot de passe ou clé n'est visible.
+| `14-sonarqube-webhook.png` | SonarQube → Administration → Webhooks |
+| `15-dockerhub-tags.png` | hub.docker.com → `jogoat123/souverainrecrut-backend` → Tags |
+| `20-vmware-snapshot.png` | VMware → VM → Snapshot → Snapshot Manager |
+| `22-gitlab-variables.png` | GitLab → Settings → CI/CD → Variables (valeurs masquées) |
+| `27-gitlab-pipeline-complet.png` | pipeline avec les 3 jobs verts |
+| `28-api-health-navigateur.png` | `http://192.168.13.129:4000/v1/health` dans le navigateur |
+| `29-api-info-1.1.0.png` | `http://192.168.13.129:4000/v1/info` après déploiement de la 1.1.0 |
+| `30-gitlab-rollback.png` | job `rollback-production` réussi |
+| `31-api-info-apres-rollback.png` | `/v1/info` affichant 1.0.0 après le rollback |

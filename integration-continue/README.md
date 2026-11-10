@@ -166,6 +166,7 @@ Docker Hub est injecté par `withCredentials`, passé par `--password-stdin`, ma
 | Quality Gate | `Pipeline aborted due to quality gate failure` | Seuil non respecté | Ouvrir le tableau de bord Sonar, corriger (tests, hotspot, duplication…) |
 | Build image | Erreur réseau à `npm ci` | Indisponibilité passagère du registre npm | Relancer le build |
 | Trivy scan | `Total: n (CRITICAL: n)`, exit code 1 | Vulnérabilité critique corrigeable | Lire `trivy-report.txt`, mettre à jour la dépendance (`npm update <pkg>`), relancer |
+| Démarrage | `docker desktop start` : *Docker Desktop terminated unexpectedly* / `ERROR_NO_SYSTEM_RESOURCES` (après utilisation de la VM VMware) | Machine virtuelle WSL restée bloquée, RAM insuffisante | `wsl --shutdown` puis `docker desktop start` ; en dernier recours, redémarrer Windows |
 | Push | `denied: requested access to the resource is denied` | Token Docker Hub invalide ou sans droit d'écriture | Recréer un token Read & Write, mettre à jour le credential `dockerhub` |
 
 Incidents réellement rencontrés et résolus : voir [`../documentation/rapport-final.md`](../documentation/rapport-final.md), section 6.
