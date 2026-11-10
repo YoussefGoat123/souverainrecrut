@@ -48,8 +48,12 @@ RUN npm ci --omit=dev --ignore-scripts \
  && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
            /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
-# Code compilé, client Prisma généré et schéma/migrations
+# Code compilé, client Prisma généré et schéma/migrations.
+# Le moteur de migration Prisma (schema-engine), téléchargé à l'étape builder, est copié :
+# sans lui, "prisma migrate deploy" tenterait de le télécharger au démarrage et échouerait
+# (node_modules non modifiable par l'utilisateur non-root).
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma/engines ./node_modules/@prisma/engines
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
